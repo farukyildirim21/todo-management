@@ -1,10 +1,11 @@
 using MongoDB.Driver;
 using TodoManagement.Application.Abstractions.Persistence;
 using TodoManagement.Domain.Todos;
+using TodoManagement.Infrastructure.Persistence.Documents;
 
-namespace TodoManagement.Infrastructure.Persistence.Mongo;
+namespace TodoManagement.Infrastructure.Persistence;
 
-public class MongoTodoRepository : ITodoRepository
+public sealed class MongoTodoRepository : ITodoRepository
 {
     private readonly IMongoCollection<TodoDocument> _collection;
 
@@ -19,7 +20,10 @@ public class MongoTodoRepository : ITodoRepository
             .Find(x => x.Id == id.Value)
             .FirstOrDefaultAsync();
 
-        return doc == null ? null : MapToDomain(doc);
+        if (doc is null)
+            return null;
+
+        return MapToDomain(doc);
     }
 
     public async Task AddAsync(Todo todo)
@@ -32,7 +36,8 @@ public class MongoTodoRepository : ITodoRepository
         var filter = Builders<TodoDocument>.Filter.Eq(x => x.Id, todo.Id.Value);
 
         var update = Builders<TodoDocument>.Update
-            .Set(x => x.Status, todo.Status.ToString());
+            .Set(x => x.Status, todo.Status.ToString())
+            .Set(x => x.Title, todo.Title);
 
         await _collection.UpdateOneAsync(filter, update);
     }
@@ -42,17 +47,15 @@ public class MongoTodoRepository : ITodoRepository
         {
             Id = todo.Id.Value,
             UserId = todo.UserId,
-            Title = todo.Title.Value,
-            Status = todo.Status.ToString(),
-            CreatedAt = todo.CreatedAt
+            Title = todo.Title,
+            Status = todo.Status.ToString()
         };
-//🎯 REHYDRATE’İN AMACI TAM OLARAK Rehydrate = “Bu aggregate zaten vardı, ben sadece belleğe geri alıyorum.”
+
     private static Todo MapToDomain(TodoDocument doc)
         => Todo.Rehydrate(
             new TodoId(doc.Id),
             doc.UserId,
             doc.Title,
-            doc.Status,
-            doc.CreatedAt
+            Enum.Parse<TodoStatus>(doc.Status)
         );
 }
