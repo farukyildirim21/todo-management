@@ -35,8 +35,8 @@ public sealed class TodosController : ControllerBase
         await _createTodoHandler.Handle(command);
 
         return Ok();
-        // istersen ileride:
-        // return CreatedAtAction(nameof(GetById), new { id = todoId }, null);
+     
+       
     }
 
     // ---------------------------
@@ -55,4 +55,32 @@ public sealed class TodosController : ControllerBase
 
         return Ok(result);
     }
+
+    // [HttpPost("{id:guid}/complete")]
+    // public async Task<IActionResult> Complete(Guid id)
+    // {
+    //     var command = new CompleteTodoCommand(id);
+    //     await _completeTodoHandler.Handle(command);
+    //     return Ok();
+    // }
+
+
+    // [HttpPost("{id:guid}/cancel")]
+    // public async Task<IActionResult> Cancel(Guid id)
+    // {
+    //     var command = new CancelTodoCommand(id);
+    //     await _cancelTodoHandler.Handle(command);
+    //     return Ok();
+    // }
+    
+    // [HttpGet("/users/{userId:guid}/todos")]
+    // public async Task<IActionResult> GetUserTodos(Guid userId)
+    // {
+    //     var query = new GetUserTodosQuery(userId);
+    //     var result = await _getUserTodosHandler.Handle(query);
+    //     return Ok(result);
+    // }
+
+
+
 }
