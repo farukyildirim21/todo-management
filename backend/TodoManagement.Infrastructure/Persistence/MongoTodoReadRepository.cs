@@ -8,6 +8,7 @@ using TodoManagement.Infrastructure.Persistence.Documents;
 
 namespace TodoManagement.Infrastructure.Persistence;
 
+
 public sealed class MongoTodoReadRepository : ITodoReadRepository
 {
     private readonly IMongoCollection<TodoDocument> _collection;
