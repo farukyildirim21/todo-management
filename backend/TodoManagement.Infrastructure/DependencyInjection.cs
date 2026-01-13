@@ -8,6 +8,9 @@ using TodoManagement.Application.Abstractions.Persistence;
 using TodoManagement.Infrastructure.Caching;
 using TodoManagement.Infrastructure.Events;
 using TodoManagement.Infrastructure.Persistence;
+using TodoManagement.Domain.Todos.Events;
+using TodoManagement.Infrastructure.Events.Handlers;
+
 
 namespace TodoManagement.Infrastructure;
 
@@ -48,6 +51,12 @@ return ConnectionMultiplexer.Connect(redisConnection);
 
         // 🔹 Domain Events
         services.AddScoped<IDomainEventDispatcher, InMemoryDomainEventDispatcher>();
+
+        services.AddScoped<IDomainEventHandler<TodoCompletedDomainEvent>,
+            TodoCompletedCacheInvalidationHandler>();
+
+        services.AddScoped<IDomainEventHandler<TodoCancelledDomainEvent>,
+            TodoCancelledCacheInvalidationHandler>();
 
         return services;
     }

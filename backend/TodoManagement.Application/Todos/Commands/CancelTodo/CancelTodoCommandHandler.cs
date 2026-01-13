@@ -1,5 +1,6 @@
 using TodoManagement.Application.Abstractions.Messaging;
 using TodoManagement.Application.Abstractions.Persistence;
+using TodoManagement.Domain.Todos;
 
 namespace TodoManagement.Application.Todos.Commands.CancelTodo;
 
@@ -18,8 +19,9 @@ public sealed class CancelTodoCommandHandler
 
     public async Task Handle(CancelTodoCommand command)
     {
-        var todo = await _repository.GetByIdAsync(command.TodoId);
+        var todoId = new TodoId(command.todoId); // ✅ doğru yer
 
+        var todo = await _repository.GetByIdAsync(todoId);
         if (todo is null)
             throw new Exception("Todo not found.");
 

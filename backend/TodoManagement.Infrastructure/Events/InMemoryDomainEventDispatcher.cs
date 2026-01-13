@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using TodoManagement.Application.Abstractions.Messaging;
 using TodoManagement.Domain.Abstractions;
 
@@ -5,8 +6,26 @@ namespace TodoManagement.Infrastructure.Events;
 
 public sealed class InMemoryDomainEventDispatcher : IDomainEventDispatcher
 {
-    public Task DispatchAsync(IEnumerable<IDomainEvent> domainEvents)
+    private readonly IServiceProvider _serviceProvider;
+
+    public InMemoryDomainEventDispatcher(IServiceProvider serviceProvider)
     {
-        return Task.CompletedTask;
+        _serviceProvider = serviceProvider;
+    }
+
+    public async Task DispatchAsync(IEnumerable<IDomainEvent> domainEvents)
+    {
+        foreach (var domainEvent in domainEvents)
+        {
+            var handlerType = typeof(IDomainEventHandler<>)
+                .MakeGenericType(domainEvent.GetType());
+
+            var handlers = _serviceProvider.GetServices(handlerType);
+
+            foreach (var handler in handlers)
+            {
+                await ((dynamic)handler).Handle((dynamic)domainEvent);
+            }
+        }
     }
 }

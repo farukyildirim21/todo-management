@@ -32,7 +32,7 @@ public sealed class Todo : AggregateRoot
         Title = title;
         Status = TodoStatus.Created;
 
-        AddDomainEvent(new TodoCreated(Id, UserId, Title));
+        AddDomainEvent(new TodoCreatedDomainEvent(Id, UserId, Title));
     }
     // ToDo objecesi create üzerinden oluşturulur. 
     public static Todo Create(Guid userId, string title)
@@ -56,7 +56,7 @@ public sealed class Todo : AggregateRoot
             throw new DomainException("Cancelled todo cannot be completed.");
 
         Status = TodoStatus.Completed;
-        AddDomainEvent(new TodoCompleted(Id));
+        AddDomainEvent(new TodoCompletedDomainEvent(Id, UserId));
     }
 
     public void Cancel()
@@ -68,7 +68,7 @@ public sealed class Todo : AggregateRoot
             throw new DomainException("Completed todo cannot be cancelled.");
 
         Status = TodoStatus.Cancelled;
-        AddDomainEvent(new TodoCancelled(Id));
+        AddDomainEvent(new TodoCancelledDomainEvent(Id, UserId));
     }
     public static Todo Rehydrate(
     TodoId id,
