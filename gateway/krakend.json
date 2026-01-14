@@ -1,0 +1,76 @@
+{
+  "$schema": "https://www.krakend.io/schema/v3.json",
+  "version": 3,
+  "name": "todo-management-gateway",
+  "port": 8081,
+  "timeout": "5s",
+
+  "extra_config": {
+    "security/cors": {
+      "allow_origins": ["*"],
+      "allow_methods": ["GET", "POST"],
+      "allow_headers": ["Origin", "Content-Type", "Authorization"],
+      "expose_headers": ["Content-Length"],
+      "max_age": "12h"
+    },
+
+    "telemetry/logging": {
+      "level": "INFO",
+      "prefix": "[KRAKEND]",
+      "stdout": true,
+      "syslog": false
+    },
+
+    "telemetry/metrics": {
+      "collection_time": "60s",
+      "listen_address": ":8090"
+    }
+  },
+
+  "endpoints": [
+    {
+      "endpoint": "/todos/{id}",
+      "method": "GET",
+      "backend": [
+        {
+          "host": ["http://backend-api:8080"],
+          "url_pattern": "/api/todos/{id}",
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "endpoint": "/todos/{id}/complete",
+      "method": "POST",
+      "backend": [
+        {
+          "host": ["http://backend-api:8080"],
+          "url_pattern": "/api/todos/{id}/complete",
+          "method": "POST"
+        }
+      ]
+    },
+    {
+      "endpoint": "/todos/{id}/cancel",
+      "method": "POST",
+      "backend": [
+        {
+          "host": ["http://backend-api:8080"],
+          "url_pattern": "/api/todos/{id}/cancel",
+          "method": "POST"
+        }
+      ]
+    },
+    {
+      "endpoint": "/users/{userId}/todos",
+      "method": "GET",
+      "backend": [
+        {
+          "host": ["http://backend-api:8080"],
+          "url_pattern": "/api/users/{userId}/todos",
+          "method": "GET"
+        }
+      ]
+    }
+  ]
+}
