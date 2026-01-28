@@ -6,5 +6,5 @@ namespace TodoManagement.Application.Abstractions.Persistence;
 public interface ITodoReadRepository
 {
     Task<GetTodoDetailResult?> GetTodoDetailAsync(Guid todoId);
-    Task<IReadOnlyList<UserTodoItem>> GetUserTodosAsync(Guid userId);
+    Task<IReadOnlyList<GetUserTodosResult>> GetUserTodosAsync(Guid userId);
 }

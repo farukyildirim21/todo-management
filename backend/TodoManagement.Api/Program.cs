@@ -1,24 +1,26 @@
 using TodoManagement.Api.Middlewares;
 using TodoManagement.Application;
 using TodoManagement.Infrastructure;
+using TodoManagement.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔹 Controllers
+// Controllers
 builder.Services.AddControllers();
 
-// 🔹 Application
+// Application
 builder.Services.AddApplication();
 
-// 🔹 Infrastructure
+// Infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-// 🔹 Global Exception Handling
+// Global Exception Handling
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<BasicAuthMiddleware>();
 
-// 🔹 Routing
+// Routing
 app.MapControllers();
 
 app.Run();

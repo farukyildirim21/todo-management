@@ -5,11 +5,13 @@ using StackExchange.Redis;
 using TodoManagement.Application.Abstractions.Caching;
 using TodoManagement.Application.Abstractions.Messaging;
 using TodoManagement.Application.Abstractions.Persistence;
+using TodoManagement.Application.Abstractions.Identity;
 using TodoManagement.Infrastructure.Caching;
 using TodoManagement.Infrastructure.Events;
 using TodoManagement.Infrastructure.Persistence;
 using TodoManagement.Domain.Todos.Events;
 using TodoManagement.Infrastructure.Events.Handlers;
+using TodoManagement.Infrastructure.Identity;
 
 
 namespace TodoManagement.Infrastructure;
@@ -57,7 +59,16 @@ return ConnectionMultiplexer.Connect(redisConnection);
 
         services.AddScoped<IDomainEventHandler<TodoCancelledDomainEvent>,
             TodoCancelledCacheInvalidationHandler>();
+        services.AddScoped<
+            IDomainEventHandler<TodoCreatedDomainEvent>,
+            TodoCreatedCacheInvalidationHandler>();
+        
+        services.Configure<BasicAuthOptions>(
+            configuration.GetSection("BasicAuth"));
 
+        services.AddScoped<CurrentUser>();
+        services.AddScoped<ICurrentUser>(sp =>
+            sp.GetRequiredService<CurrentUser>());
         return services;
     }
 }

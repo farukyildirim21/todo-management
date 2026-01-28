@@ -12,12 +12,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // 🔹 Commands
+        //Commands
         services.AddScoped<CreateTodoCommandHandler>();
         services.AddScoped<CompleteTodoCommandHandler>();
         services.AddScoped<CancelTodoCommandHandler>();
 
-        // 🔹 Queries
+        // Queries
         services.AddScoped<GetTodoDetailQueryHandler>();
         services.AddScoped<GetUserTodosQueryHandler>();
 

@@ -13,19 +13,32 @@ public sealed class InMemoryDomainEventDispatcher : IDomainEventDispatcher
         _serviceProvider = serviceProvider;
     }
 
+   
     public async Task DispatchAsync(IEnumerable<IDomainEvent> domainEvents)
+{
+    foreach (var domainEvent in domainEvents)
     {
-        foreach (var domainEvent in domainEvents)
+        var handlerType = typeof(IDomainEventHandler<>)
+            .MakeGenericType(domainEvent.GetType());
+
+        //  BURAYA EKLE
+        var handlers = _serviceProvider
+            .GetServices(handlerType)
+            .ToList();
+
+        Console.WriteLine(
+            $"[DomainEventDispatcher] Event: {domainEvent.GetType().Name}, HandlerCount: {handlers.Count}"
+        );
+
+        foreach (var handler in handlers)
         {
-            var handlerType = typeof(IDomainEventHandler<>)
-                .MakeGenericType(domainEvent.GetType());
+            Console.WriteLine(
+                $"[DomainEventDispatcher] → Calling handler: {handler.GetType().Name}"
+            );
 
-            var handlers = _serviceProvider.GetServices(handlerType);
-
-            foreach (var handler in handlers)
-            {
-                await ((dynamic)handler).Handle((dynamic)domainEvent);
-            }
+            await ((dynamic)handler).Handle((dynamic)domainEvent);
         }
     }
+}
+
 }

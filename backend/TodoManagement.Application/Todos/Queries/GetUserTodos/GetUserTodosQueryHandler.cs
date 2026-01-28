@@ -11,7 +11,7 @@ public sealed class GetUserTodosQueryHandler
         _repository = repository;
     }
 
-    public Task<IReadOnlyList<UserTodoItem>> Handle(GetUserTodosQuery query)
+    public Task<IReadOnlyList<GetUserTodosResult>> Handle(GetUserTodosQuery query)
     {
         return _repository.GetUserTodosAsync(query.UserId);
     }

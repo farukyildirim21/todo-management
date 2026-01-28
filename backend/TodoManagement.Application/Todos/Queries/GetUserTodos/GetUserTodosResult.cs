@@ -1,6 +1,6 @@
 namespace TodoManagement.Application.Todos.Queries.GetUserTodos;
 
-public sealed class UserTodoItem
+public sealed class GetUserTodosResult
 {
     public Guid Id { get; init; }
     public string Title { get; init; } = default!;

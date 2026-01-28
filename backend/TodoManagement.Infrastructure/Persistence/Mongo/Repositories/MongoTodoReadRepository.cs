@@ -59,14 +59,19 @@ public sealed class MongoTodoReadRepository : ITodoReadRepository
     }
 
     // 🔹 Kullanıcıya ait todo listesi
-    public async Task<IReadOnlyList<UserTodoItem>> GetUserTodosAsync(Guid userId)
+    public async Task<IReadOnlyList<GetUserTodosResult>> GetUserTodosAsync(Guid userId)
     {
         var cacheKey = CacheKeys.TodosByUser(userId);
 
         // 1️⃣ Cache
-        var cached = await _cache.GetAsync<IReadOnlyList<UserTodoItem>>(cacheKey);
-        if (cached != null)
+        var cached = await _cache.GetAsync<IReadOnlyList<GetUserTodosResult>>(cacheKey);
+        if (cached != null){
+
+Console.WriteLine("🟢 TODOS FROM REDIS");
             return cached;
+}
+
+Console.WriteLine("🟡 TODOS FROM MONGO");
 
         // 2️⃣ Mongo
         var docs = await _collection
@@ -75,7 +80,7 @@ public sealed class MongoTodoReadRepository : ITodoReadRepository
 
         // 3️⃣ Mapping → Application Read Model
         var items = docs
-            .Select(x => new UserTodoItem
+            .Select(x => new GetUserTodosResult
             {
                 Id = x.Id,
                 Title = x.Title,
