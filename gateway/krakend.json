@@ -8,8 +8,8 @@
   "extra_config": {
     "security/cors": {
       "allow_origins": ["*"],
-      "allow_methods": ["GET", "POST"],
-      "allow_headers": ["Origin", "Content-Type", "Authorization"],
+      "allow_methods": ["GET", "POST", "OPTIONS"],
+      "allow_headers": ["Origin", "Content-Type", "Authorization", "Accept"],
       "expose_headers": ["Content-Length"],
       "max_age": "12h"
     },
@@ -22,18 +22,48 @@
     },
 
     "telemetry/metrics": {
-      "collection_time": "60s",
+      "collection_time":":60s",
       "listen_address": ":8090"
     }
   },
 
   "endpoints": [
     {
-      "endpoint": "/todos/{id}",
+      "endpoint": "/todos",
       "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["Authorization", "Accept"],
       "backend": [
         {
-          "host": ["http://backend-api:8080"],
+          "host": ["http://host.docker.internal:8080"],
+          "url_pattern": "/api/todos",
+          "method": "GET",
+          "isCollection": true
+          
+        }
+      ]
+    },
+    {
+      "endpoint": "/todos",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["Authorization", "Content-Type", "Accept"],
+      "backend": [
+        {
+          "host": ["http://host.docker.internal:8080"],
+          "url_pattern": "/api/todos",
+          "method": "POST"
+        }
+      ]
+    },
+    {
+      "endpoint": "/todos/{id}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "input_headers": ["Authorization", "Accept"],
+      "backend": [
+        {
+          "host": ["http://host.docker.internal:8080"],
           "url_pattern": "/api/todos/{id}",
           "method": "GET"
         }
@@ -42,9 +72,11 @@
     {
       "endpoint": "/todos/{id}/complete",
       "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["Authorization", "Content-Type", "Accept"],
       "backend": [
         {
-          "host": ["http://backend-api:8080"],
+          "host": ["http://host.docker.internal:8080"],
           "url_pattern": "/api/todos/{id}/complete",
           "method": "POST"
         }
@@ -53,22 +85,13 @@
     {
       "endpoint": "/todos/{id}/cancel",
       "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["Authorization", "Content-Type", "Accept"],
       "backend": [
         {
-          "host": ["http://backend-api:8080"],
+          "host": ["http://host.docker.internal:8080"],
           "url_pattern": "/api/todos/{id}/cancel",
           "method": "POST"
-        }
-      ]
-    },
-    {
-      "endpoint": "/users/{userId}/todos",
-      "method": "GET",
-      "backend": [
-        {
-          "host": ["http://backend-api:8080"],
-          "url_pattern": "/api/users/{userId}/todos",
-          "method": "GET"
         }
       ]
     }
