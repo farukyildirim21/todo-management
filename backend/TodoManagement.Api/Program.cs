@@ -5,6 +5,12 @@ using TodoManagement.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Explicitly bind Kestrel to all interfaces on 8080 for container access
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(8080);
+});
+
 // Controllers
 builder.Services.AddControllers();
 

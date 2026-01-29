@@ -4,7 +4,8 @@ WORKDIR /workspace
 COPY . .
 
 WORKDIR /workspace/TodoManagement.Api
-RUN DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0 dotnet restore
+RUN DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0 \
+    dotnet restore --configfile ../NuGet.Config
 RUN dotnet publish -c Release -o /app --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
