@@ -1,34 +1,16 @@
-﻿# =========================
-# Build stage
-# =========================
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+﻿FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 
-# Solution ve projeleri kopyala
-COPY backend/*.sln ./
-COPY backend/TodoManagement.Domain/*.csproj TodoManagement.Domain/
-COPY backend/TodoManagement.Application/*.csproj TodoManagement.Application/
-COPY backend/TodoManagement.Infrastructure/*.csproj TodoManagement.Infrastructure/
-COPY backend/TodoManagement.Api/*.csproj TodoManagement.Api/
+WORKDIR /workspace
+COPY . .
 
-# NuGet restore
-RUN dotnet restore TodoManagement.Api/TodoManagement.Api.csproj
+WORKDIR /workspace/TodoManagement.Api
+RUN DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0 dotnet restore
+RUN dotnet publish -c Release -o /app --no-restore
 
-# Tüm source kodu kopyala
-COPY backend/. .
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 
-# Publish
-WORKDIR /src/TodoManagement.Api
-RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
-
-# =========================
-# Runtime stage
-# =========================
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-
-COPY --from=build /app/publish .
+COPY --from=build /app .
 
 EXPOSE 8080
-
 ENTRYPOINT ["dotnet", "TodoManagement.Api.dll"]
