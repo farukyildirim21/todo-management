@@ -1,0 +1,73 @@
+version: "3.9"
+
+services:
+  # -----------------------------
+  # MongoDB
+  # -----------------------------
+  mongo:
+    image: mongo:6
+    container_name: todo-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+
+  # -----------------------------
+  # Redis
+  # -----------------------------
+  redis:
+    image: redis:7
+    container_name: todo-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  # -----------------------------
+  # Backend API (.NET 8)
+  # -----------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: TodoManagement.Api/Dockerfile
+    container_name: todo-backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      MongoDb__ConnectionString: mongodb://mongo:27017
+      MongoDb__Database: TodoManagement
+      Redis__ConnectionString: redis:6379
+    ports:
+      - "8080:8080"
+
+  # -----------------------------
+  # KrakenD API Gateway
+  # -----------------------------
+  gateway:
+    build:
+      context: ./gateway
+    container_name: todo-gateway
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8081:8081"
+
+  # -----------------------------
+  # Frontend (React + Vite)
+  # -----------------------------
+  frontend:
+    build:
+      context: ./frontend
+    container_name: todo-frontend
+    restart: unless-stopped
+    depends_on:
+      - gateway
+    ports:
+      - "5173:5173"
+
+volumes:
+  mongo-data:
