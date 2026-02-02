@@ -26,9 +26,9 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
-            // 🔥 LOG THE FULL EXCEPTION
+            // LOG THE FULL EXCEPTION
             _logger.LogError(ex,
-                "🔥 Unhandled exception occurred. Path: {Path}",
+                "Unhandled exception occurred. Path: {Path}",
                 context.Request.Path);
 
             context.Response.Clear();
@@ -41,7 +41,7 @@ public class ExceptionHandlingMiddleware
                 message = ex.Message,
                 exceptionType = ex.GetType().FullName,
                 path = context.Request.Path,
-                stackTrace = ex.StackTrace // ⚠️ DEV ortamı için OK
+                stackTrace = ex.StackTrace // DEV ortamı için OK
             };
 
             await context.Response.WriteAsync(

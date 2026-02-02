@@ -2,7 +2,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace TodoManagement.Infrastructure.Persistence.Documents;
-
+//MongoDB’de saklanan verinin birebir karşılığıdır.
 public sealed class TodoDocument
 {
     //  [BsonId] = Bu property MongoDB document’inin _id alanıdır 

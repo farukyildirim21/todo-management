@@ -13,7 +13,7 @@ public sealed class MongoTodoRepository : ITodoRepository
     {
         _collection = database.GetCollection<TodoDocument>("Todos");
     }
-
+    //MongoDB’den Todo verisini alır, domain aggregate root’a çevirir ve Application Layer’a döner.
     public async Task<Todo?> GetByIdAsync(TodoId id)
     {
         var doc = await _collection
@@ -25,12 +25,12 @@ public sealed class MongoTodoRepository : ITodoRepository
 
         return MapToDomain(doc);
     }
-
+    //Yeni oluşturulmuş Todo aggregate’ını MongoDB’ye ilk kez yazar.
     public async Task AddAsync(Todo todo)
     {
         await _collection.InsertOneAsync(MapToDocument(todo));
     }
-
+    //Rehydrate edilmiş ve değiştirilmiş Todo aggregate’ının yeni state’ini MongoDB’ye yazar.
     public async Task UpdateAsync(Todo todo)
     {
         var filter = Builders<TodoDocument>.Filter.Eq(x => x.Id, todo.Id.Value);
@@ -41,7 +41,7 @@ public sealed class MongoTodoRepository : ITodoRepository
 
         await _collection.UpdateOneAsync(filter, update);
     }
-
+    //verileri documente ceviriyor
     private static TodoDocument MapToDocument(Todo todo)
         => new()
         {
@@ -50,7 +50,7 @@ public sealed class MongoTodoRepository : ITodoRepository
             Title = todo.Title,
             Status = todo.Status.ToString()
         };
-
+    //mongodb verilerini domain ceviriyor. 
     private static Todo MapToDomain(TodoDocument doc)
         => Todo.Rehydrate(
             new TodoId(doc.Id),

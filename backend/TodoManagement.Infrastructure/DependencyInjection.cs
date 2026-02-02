@@ -47,11 +47,11 @@ return ConnectionMultiplexer.Connect(redisConnection);
 
         services.AddScoped<ICacheService, RedisCacheService>();
 
-        // 🔹 Repositories
+        // Repositories
         services.AddScoped<ITodoRepository, MongoTodoRepository>();
         services.AddScoped<ITodoReadRepository, MongoTodoReadRepository>();
 
-        // 🔹 Domain Events
+        // Domain Events
         services.AddScoped<IDomainEventDispatcher, InMemoryDomainEventDispatcher>();
 
         services.AddScoped<IDomainEventHandler<TodoCompletedDomainEvent>,

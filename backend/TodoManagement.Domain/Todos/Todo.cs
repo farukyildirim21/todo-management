@@ -70,6 +70,8 @@ public sealed class Todo : AggregateRoot
         Status = TodoStatus.Cancelled;
         AddDomainEvent(new TodoCancelledDomainEvent(Id, UserId));
     }
+    // write tarafında kullanılır. kalıcı hale getirilmis bir verinin iş kurallarını tetiklemeden
+    //tekrarda bellege alınması islemidir. 
     public static Todo Rehydrate(
     TodoId id,
     Guid userId,
