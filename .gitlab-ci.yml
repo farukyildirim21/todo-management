@@ -13,11 +13,10 @@ build-backend-image:
   stage: build
   image: docker:27.5.1
   before_script:
-    # GitLab Container Registry login
-    - echo "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - 'echo "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"'
   script:
-    - echo "Building backend image: $IMAGE_NAME"
-    - docker build -f backend/TodoManagement.Api/Dockerfile -t $IMAGE_NAME backend
-    - docker push $IMAGE_NAME
+    - 'echo "Building backend image: $IMAGE_NAME"'
+    - 'docker build -f backend/TodoManagement.Api/Dockerfile -t "$IMAGE_NAME" backend'
+    - 'docker push "$IMAGE_NAME"'
   rules:
     - when: always
