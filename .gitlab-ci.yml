@@ -1,11 +1,23 @@
-image: mcr.microsoft.com/dotnet/sdk:8.0
+include:
+  - project: "retailcore/gitlab-ci"
+    ref: main
+    file: ".gitlab-ci-deploy.yml"
 
 stages:
   - build
 
-ci-build:
+variables:
+  IMAGE_NAME: "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHORT_SHA"
+
+build-backend-image:
   stage: build
+  image: docker:27.5.1
+  before_script:
+    # GitLab Container Registry login
+    - echo "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   script:
-    - dotnet --info
-    - dotnet restore backend/TodoManagement.sln
-    - dotnet build backend/TodoManagement.sln -c Release
+    - echo "Building backend image: $IMAGE_NAME"
+    - docker build -f backend/TodoManagement.Api/Dockerfile -t $IMAGE_NAME backend
+    - docker push $IMAGE_NAME
+  rules:
+    - when: always
