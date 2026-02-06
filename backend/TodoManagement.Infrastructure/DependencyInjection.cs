@@ -22,28 +22,46 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // 🔹 MongoDB
-        services.AddSingleton<IMongoClient>(_ =>
-        {
-            var connectionString = configuration.GetConnectionString("MongoDb");
-            return new MongoClient(connectionString);
-        });
+      
+       // 🔹 MongoDB
+services.AddSingleton<IMongoClient>(_ =>
+{
+    var connectionString = configuration["MongoDb:ConnectionString"]
+        ?? throw new InvalidOperationException("MongoDb connection string missing");
 
-        services.AddSingleton<IMongoDatabase>(sp =>
-        {
-            var client = sp.GetRequiredService<IMongoClient>();
-            var databaseName = configuration.GetValue<string>("MongoDb:Database");
-            return client.GetDatabase(databaseName);
-        });
+    return new MongoClient(connectionString);
+});
+
+services.AddSingleton<IMongoDatabase>(sp =>
+{
+    var client = sp.GetRequiredService<IMongoClient>();
+    var databaseName = configuration["MongoDb:Database"]
+        ?? throw new InvalidOperationException("MongoDb database name missing");
+
+    return client.GetDatabase(databaseName);
+});
+
 
         // 🔹 Redis
-        services.AddSingleton<IConnectionMultiplexer>(_ =>
-        {
-            var redisConnection = configuration.GetConnectionString("Redis")
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var redisConnection = configuration["Redis:ConnectionString"]
     ?? throw new InvalidOperationException("Redis connection string is missing");
 
-return ConnectionMultiplexer.Connect(redisConnection);
-        });
+
+    var options = ConfigurationOptions.Parse(redisConnection);
+
+    // 🔥 EN KRİTİK SATIR
+    options.AbortOnConnectFail = false;
+
+    // Tavsiye edilen ek ayarlar
+    options.ConnectRetry = 5;
+    options.ConnectTimeout = 5000;
+    options.ReconnectRetryPolicy = new ExponentialRetry(1000);
+
+    return ConnectionMultiplexer.Connect(options);
+});
+
 
         services.AddScoped<ICacheService, RedisCacheService>();
 

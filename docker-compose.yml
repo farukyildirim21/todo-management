@@ -39,7 +39,7 @@ services:
       ASPNETCORE_URLS: http://0.0.0.0:8080
       MongoDb__ConnectionString: mongodb://mongo:27017
       MongoDb__Database: TodoManagement
-      Redis__ConnectionString: redis:6379
+      Redis__ConnectionString: redis:6379,abortConnect=false
     ports:
       - "8080:8080"
 
