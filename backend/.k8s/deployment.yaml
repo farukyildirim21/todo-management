@@ -25,19 +25,21 @@ spec:
           imagePullPolicy: Always
 
           env:
-            - name: ASPNETCORE_URLS
-              value: "http://0.0.0.0:8080"
+            - name: ENV
+              value: test
 
           ports:
             - containerPort: 8080
+              
+              protocol: TCP
 
           resources:
             requests:
-              cpu: "100m"
-              memory: "256Mi"
+              cpu: "0.05"
+              memory: "50Mi"
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: "0.2"
+              memory: "100Mi"
 
       imagePullSecrets:
         - name: retail-gitlab
