@@ -2,15 +2,7 @@ stages:
   - build
   - deploy-test
 
-variables:
-  APP_NAME: 'todomanagement-api'
-  ENV: 'test'
-  NAMESPACE: 'todo-test'
-  IMAGE_PATH: '$CI_REGISTRY_IMAGE/${APP_NAME}:${CI_PIPELINE_ID}'
-  NODE_ENV: 'production'
 
-  VAULT_ADDRESS_QA: 'https://pass-portal-qa.hepsiburada.com'
-  VAULT_ADDRESS_PROD: 'https://pass-portal.hepsiburada.com'
 
 
 # -------------------------
@@ -21,16 +13,28 @@ build-push:
   image: docker:27
   services:
     - name: docker:27-dind
+      alias: docker
       command: ["--mtu=1410"]
   tags:
     - k8s
+  variables:
+    APP_NAME: 'todomanagement-api'
+    ENV: 'test'
+    NAMESPACE: 'todo-test'
+    IMAGE_PATH: '$CI_REGISTRY_IMAGE/${APP_NAME}:${CI_PIPELINE_ID}'
+    NODE_ENV: 'production'
+
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+    VAULT_ADDRESS_QA: 'https://pass-portal-qa.hepsiburada.com'
+    VAULT_ADDRESS_PROD: 'https://pass-portal.hepsiburada.com'
   before_script:
-    # DockerHub login (rate limit için)
     - docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_PASSWORD"
-    # GitLab Registry login
     - echo -n "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   script:
-    - echo "IMAGE => $IMAGE_PATH"
+    - echo "DOCKER_HOST=$DOCKER_HOST"
+    - docker info
     - docker build --rm=true --no-cache --pull -f backend/TodoManagement.Api/Dockerfile -t "$IMAGE_PATH" .
     - docker push "$IMAGE_PATH"
   retry:
