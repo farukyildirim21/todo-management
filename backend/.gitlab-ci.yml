@@ -12,6 +12,9 @@ variables:
   DOCKER_HOST: tcp://localhost:2375
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
+  VAULT_ADDRESS_QA: 'https://pass-portal-qa.hepsiburada.com'
+  VAULT_ADDRESS_PROD: 'https://pass-portal.hepsiburada.com'
+
 
 # -------------------------
 # BUILD & PUSH IMAGE
