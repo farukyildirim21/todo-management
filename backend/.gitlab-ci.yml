@@ -78,6 +78,28 @@ deploy-test:
       else
       echo "service.yaml not found";
       fi
+    
+    # -------------------------
+    # ✅ VERIFY / HEALTH CHECK
+    # -------------------------
+
+    - echo "📦 Namespace kontrol:"
+    - kubectl get ns | grep "$NAMESPACE"
+
+    - echo "🚀 Deployment durumu:"
+    - kubectl get deployment -n "$NAMESPACE"
+
+    - echo "⏳ Pod Ready olmasını bekliyoruz..."
+    - kubectl rollout status deployment/$APP_NAME -n "$NAMESPACE" --timeout=120s
+
+    - echo "📦 Pod listesi:"
+    - kubectl get pods -n "$NAMESPACE" -o wide
+
+    - echo "🧠 Pod detay (ilk pod):"
+    - kubectl describe pod -n "$NAMESPACE" -l app=$APP_NAME | tail -n 120
+
+    - echo "📜 Application logları:"
+    - kubectl logs -n "$NAMESPACE" -l app=$APP_NAME --tail=200
   after_script:
     - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:$VAULT_CLUSTER
   allow_failure: false
