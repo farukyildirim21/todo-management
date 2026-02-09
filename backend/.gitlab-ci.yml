@@ -12,9 +12,10 @@ build-push:
   stage: build
   image: docker:27
   services:
-    - name: docker:27-dind
+    - name: docker:27.5.1-dind
       alias: docker
-      command: ["--mtu=1410"]
+      command: ["--tls=false","--mtu=1410"]
+       
   tags:
     - k8s
   variables:
@@ -24,7 +25,7 @@ build-push:
     IMAGE_PATH: '$CI_REGISTRY_IMAGE/${APP_NAME}:${CI_PIPELINE_ID}'
     NODE_ENV: 'production'
 
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: "tcp://docker:2375"
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
     VAULT_ADDRESS_QA: 'https://pass-portal-qa.hepsiburada.com'
