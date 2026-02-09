@@ -31,7 +31,7 @@ build-push:
     - echo -n "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   script:
     - echo "IMAGE => $IMAGE_PATH"
-    - docker build --rm=true --no-cache --disable-content-trust --pull -f backend/TodoManagement.Api/Dockerfile -t "$IMAGE_PATH" . 
+    - docker build --rm=true --no-cache --pull -f backend/TodoManagement.Api/Dockerfile -t "$IMAGE_PATH" .
     - docker push "$IMAGE_PATH"
   retry:
     max: 2
