@@ -1,0 +1,57 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  APP_NAME: 'todomanagement-api'
+  ENV: 'test'
+  NAMESPACE: 'todo-test'
+  IMAGE_PATH: '$CI_REGISTRY_IMAGE/${APP_NAME}:${CI_PIPELINE_ID}'
+  VAULT_CLUSTER: 'retail-hke-test'
+
+# -----------------------
+# BUILD & PUSH IMAGE
+# -----------------------
+build-push:
+  stage: build
+  image: docker:24
+  services:
+    - name: docker:24-dind
+  tags:
+    - k8s
+  before_script:
+    - docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_PASSWORD"
+    - echo -n "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  script:
+    # Dockerfile backend/TodoManagement.Api altında
+    - docker build -f backend/TodoManagement.Api/Dockerfile -t "$IMAGE_PATH" .
+    - docker push "$IMAGE_PATH"
+  retry:
+    max: 2
+    when: runner_system_failure
+
+# -----------------------
+# DEPLOY TO K8S (AGENT)
+# -----------------------
+deploy-test:
+  stage: deploy
+  image: devopshepsiburada/kubectl:1.25.0
+  tags:
+    - k8s
+  before_script:
+    - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:$VAULT_CLUSTER
+  script:
+    # Namespace (idempotent)
+    - kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
+
+    # Image pull secret (idempotent)
+    - kubectl create secret docker-registry retail-gitlab
+      --docker-server="$CI_REGISTRY"
+      --docker-username="$DEPLOY_USERNAME"
+      --docker-password="$DEPLOY_PASSWORD"
+      -n "$NAMESPACE" || echo "secret exists"
+
+    # Apply manifests
+    - cat backend/.k8s/deployment.yaml | envsubst | kubectl apply -f -
+    - cat backend/.k8s/service.yaml | envsubst | kubectl apply -f -
+  timeout: 10 minutes

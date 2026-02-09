@@ -28,5 +28,6 @@ app.UseMiddleware<BasicAuthMiddleware>();
 
 // Routing
 app.MapControllers();
+app.MapGet("/health", () => Results.Ok("Healthy"));
 
 app.Run();

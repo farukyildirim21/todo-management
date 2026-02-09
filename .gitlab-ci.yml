@@ -1,11 +1,2 @@
-image: mcr.microsoft.com/dotnet/sdk:8.0
-
-stages:
-  - build
-
-ci-build:
-  stage: build
-  script:
-    - dotnet --info
-    - dotnet restore backend/TodoManagement.sln
-    - dotnet build backend/TodoManagement.sln -c Release
+include:
+  - local: '/backend/.gitlab-ci.yml'
