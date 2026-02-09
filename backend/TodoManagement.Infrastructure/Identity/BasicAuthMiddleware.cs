@@ -26,7 +26,12 @@ public sealed class BasicAuthMiddleware
         _logger.LogInformation("➡️ Incoming request: {Method} {Path}",
             context.Request.Method,
             context.Request.Path);
-        if (context.Request.Path == "/health") await _next(context); return;
+        if (context.Request.Path == "/health")
+        {
+            await _next(context);
+            return;
+        }
+
 
         if (!context.Request.Headers.TryGetValue("Authorization", out var header))
         {
