@@ -21,9 +21,9 @@ variables:
 # -------------------------
 build-push:
   stage: build
-  image: docker:19
+  image: docker:27
   services:
-    - name: docker:19-dind
+    - name: docker:27-dind
       command: ["--mtu=1410"]
   tags:
     - k8s
