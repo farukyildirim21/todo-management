@@ -70,6 +70,8 @@ deploy-test:
 
     # Registry secret
     - kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE" || echo "secret already exists"
+    
+    - kubectl delete pod -n "$NAMESPACE" -l app=todomanagement-api --force --grace-period=0 || true
 
     # Apply manifests
     - cat backend/.k8s/deployment.yaml | envsubst | kubectl apply -f -
