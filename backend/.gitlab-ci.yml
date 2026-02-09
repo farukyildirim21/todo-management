@@ -2,7 +2,18 @@ stages:
   - build
   - deploy-test
 
+variables:
+    APP_NAME: 'todomanagement-api'
+    ENV: 'test'
+    NAMESPACE: 'todo-test'
+    IMAGE_PATH: '$CI_REGISTRY_IMAGE/${APP_NAME}:${CI_PIPELINE_ID}'
+    NODE_ENV: 'production'
 
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+    VAULT_ADDRESS_QA: 'https://pass-portal-qa.hepsiburada.com'
+    VAULT_ADDRESS_PROD: 'https://pass-portal.hepsiburada.com'
 
 
 # -------------------------
@@ -18,18 +29,6 @@ build-push:
        
   tags:
     - k8s
-  variables:
-    APP_NAME: 'todomanagement-api'
-    ENV: 'test'
-    NAMESPACE: 'todo-test'
-    IMAGE_PATH: '$CI_REGISTRY_IMAGE/${APP_NAME}:${CI_PIPELINE_ID}'
-    NODE_ENV: 'production'
-
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-    VAULT_ADDRESS_QA: 'https://pass-portal-qa.hepsiburada.com'
-    VAULT_ADDRESS_PROD: 'https://pass-portal.hepsiburada.com'
   before_script:
     - docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_PASSWORD"
     - echo -n "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
@@ -60,9 +59,6 @@ deploy-test:
 # -------------------------
 .deploy:
   image: devopshepsiburada/kubectl:1.25.0
-  services:
-    - name: docker:19-dind
-      command: ["--mtu=1410"]
   tags:
     - k8s
   before_script:
@@ -73,11 +69,7 @@ deploy-test:
     - kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
     # Registry secret
-    - kubectl create secret docker-registry retail-gitlab \
-      --docker-server="$CI_REGISTRY" \
-      --docker-username="$DEPLOY_USERNAME" \
-      --docker-password="$DEPLOY_PASSWORD" \
-      -n "$NAMESPACE" || echo "secret already exists"
+    - kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE" || echo "secret already exists"
 
     # Apply manifests
     - cat backend/.k8s/deployment.yaml | envsubst | kubectl apply -f -
