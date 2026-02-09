@@ -36,7 +36,7 @@ build-push:
   script:
     - echo "DOCKER_HOST=$DOCKER_HOST"
     - docker info
-    - docker build --rm=true --no-cache --pull -f backend/TodoManagement.Api/Dockerfile -t "$IMAGE_PATH" .
+    - docker build --rm=true --no-cache --pull -f TodoManagement.Api/Dockerfile -t "$IMAGE_PATH" backend
     - docker push "$IMAGE_PATH"
   retry:
     max: 2
