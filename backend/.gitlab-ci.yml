@@ -1,61 +1,88 @@
 stages:
   - build
-  - deploy
+  - deploy-test
 
 variables:
   APP_NAME: 'todomanagement-api'
   ENV: 'test'
   NAMESPACE: 'todo-test'
   IMAGE_PATH: '$CI_REGISTRY_IMAGE/${APP_NAME}:${CI_PIPELINE_ID}'
-  VAULT_CLUSTER: 'retail-hke-test'
+  NODE_ENV: 'production'
 
-# -----------------------
+  DOCKER_HOST: tcp://localhost:2375
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+# -------------------------
 # BUILD & PUSH IMAGE
-# -----------------------
+# -------------------------
 build-push:
   stage: build
-  image: docker:24
+  image: docker:19
   services:
-    - name: docker:24-dind
-      alias: docker
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+    - name: docker:19-dind
+      command: ["--mtu=1410"]
   tags:
     - k8s
   before_script:
+    # DockerHub login (rate limit için)
     - docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_PASSWORD"
+    # GitLab Registry login
     - echo -n "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   script:
-    - docker info
-    - docker build -f backend/TodoManagement.Api/Dockerfile -t "$IMAGE_PATH" .
+    - echo "IMAGE => $IMAGE_PATH"
+    - docker build --rm=true --no-cache --disable-content-trust --pull \
+      -f backend/TodoManagement.Api/Dockerfile \
+      -t "$IMAGE_PATH" .
     - docker push "$IMAGE_PATH"
   retry:
     max: 2
     when: runner_system_failure
+  timeout: 20 minutes
 
-# -----------------------
-# DEPLOY TO K8S (AGENT)
-# -----------------------
+# -------------------------
+# DEPLOY TO retail-hke-test
+# -------------------------
 deploy-test:
-  stage: deploy
+  stage: deploy-test
+  extends: .deploy
+  variables:
+    ENV: "test"
+    VAULT_CLUSTER: "retail-hke-test"
+    CI_ENVIRONMENT_SLUG: "retail-hke-test"
+
+# -------------------------
+# DEPLOY TEMPLATE
+# -------------------------
+.deploy:
   image: devopshepsiburada/kubectl:1.25.0
+  services:
+    - name: docker:19-dind
+      command: ["--mtu=1410"]
   tags:
     - k8s
   before_script:
+    - echo "Using cluster => $VAULT_CLUSTER"
     - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:$VAULT_CLUSTER
   script:
     # Namespace (idempotent)
     - kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
-    # Image pull secret (idempotent)
-    - kubectl create secret docker-registry retail-gitlab
-      --docker-server="$CI_REGISTRY"
-      --docker-username="$DEPLOY_USERNAME"
-      --docker-password="$DEPLOY_PASSWORD"
-      -n "$NAMESPACE" || echo "secret exists"
+    # Registry secret
+    - kubectl create secret docker-registry retail-gitlab \
+      --docker-server="$CI_REGISTRY" \
+      --docker-username="$DEPLOY_USERNAME" \
+      --docker-password="$DEPLOY_PASSWORD" \
+      -n "$NAMESPACE" || echo "secret already exists"
 
     # Apply manifests
     - cat backend/.k8s/deployment.yaml | envsubst | kubectl apply -f -
-    - cat backend/.k8s/service.yaml | envsubst | kubectl apply -f -
+    - if [ -f "backend/.k8s/service.yaml" ]; then
+      cat backend/.k8s/service.yaml | envsubst | kubectl apply -f -;
+      else
+      echo "service.yaml not found";
+      fi
+  after_script:
+    - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:$VAULT_CLUSTER
+  allow_failure: false
   timeout: 10 minutes
