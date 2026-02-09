@@ -17,13 +17,17 @@ build-push:
   image: docker:24
   services:
     - name: docker:24-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
   tags:
     - k8s
   before_script:
     - docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_PASSWORD"
     - echo -n "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   script:
-    # Dockerfile backend/TodoManagement.Api altında
+    - docker info
     - docker build -f backend/TodoManagement.Api/Dockerfile -t "$IMAGE_PATH" .
     - docker push "$IMAGE_PATH"
   retry:
