@@ -82,6 +82,24 @@ deploy-test:
     # -------------------------
     # ✅ VERIFY / HEALTH CHECK
     # -------------------------
+    - echo "🧾 Rendered manifest (deployment):"
+    - envsubst < backend/.k8s/deployment.yaml | sed -n '1,200p'
+
+    - echo "📌 IMAGE_PATH=$IMAGE_PATH"
+    - echo "📌 APP_NAME=$APP_NAME"
+    - echo "📌 NAMESPACE=$NAMESPACE"
+
+    - echo "🧱 ReplicaSets:"
+    - kubectl get rs -n "$NAMESPACE" -o wide
+
+    - echo "🧱 Describe Deployment:"
+    - kubectl describe deployment "$APP_NAME" -n "$NAMESPACE" | tail -n 120
+
+    - echo "🧨 Events (son 50):"
+    - kubectl get events -n "$NAMESPACE" --sort-by=.lastTimestamp | tail -n 50
+
+    - echo "📦 Pods:"
+    - kubectl get pods -n "$NAMESPACE" -o wide
 
     - echo "📦 Namespace kontrol:"
     - kubectl get ns | grep "$NAMESPACE"
