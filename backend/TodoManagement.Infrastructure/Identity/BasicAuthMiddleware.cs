@@ -26,11 +26,13 @@ public sealed class BasicAuthMiddleware
         _logger.LogInformation("➡️ Incoming request: {Method} {Path}",
             context.Request.Method,
             context.Request.Path);
-        if (context.Request.Path == "/health")
+       
+        if (context.Request.Path.StartsWithSegments("/health"))
         {
             await _next(context);
             return;
         }
+
 
         
 
