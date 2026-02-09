@@ -6,7 +6,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: ${APP_NAME}
+    app: todomanagement-api
   ports:
     - name: http
       port: 80

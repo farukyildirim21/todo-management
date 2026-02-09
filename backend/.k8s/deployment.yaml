@@ -4,7 +4,7 @@ metadata:
   name: ${APP_NAME}
   namespace: ${NAMESPACE}
   labels:
-    app: ${APP_NAME}
+    app: todomanagement-api
 spec:
   replicas: 1
 
@@ -13,12 +13,12 @@ spec:
 
   selector:
     matchLabels:
-      app: ${APP_NAME}
+      app: todomanagement-api
 
   template:
     metadata:
       labels:
-        app: ${APP_NAME}
+        app: todomanagement-api
     spec:
       terminationGracePeriodSeconds: 15   # 🔥 OLD POD KAPANABİLSİN
 
