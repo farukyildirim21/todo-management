@@ -32,6 +32,7 @@ public sealed class BasicAuthMiddleware
             return;
         }
 
+        
 
         if (!context.Request.Headers.TryGetValue("Authorization", out var header))
         {
