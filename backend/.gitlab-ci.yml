@@ -95,43 +95,6 @@ deploy-test:
     - echo "🧾 Rendered manifest (deployment):"
     - envsubst < backend/.k8s/deployment.yaml | sed -n '1,200p'
 
-    - echo "📌 IMAGE_PATH=$IMAGE_PATH"
-    - echo "📌 APP_NAME=$APP_NAME"
-    - echo "📌 NAMESPACE=$NAMESPACE"
-
-    - echo "🧱 ReplicaSets:"
-    - kubectl get rs -n "$NAMESPACE" -o wide
-
-    - echo "🧱 Describe Deployment:"
-    - kubectl describe deployment "$APP_NAME" -n "$NAMESPACE" | tail -n 120
-
-    - echo "🧨 Events (son 50):"
-    - kubectl get events -n "$NAMESPACE" --sort-by=.lastTimestamp | tail -n 50
-
-    - echo "📦 Pods:"
-    - kubectl get pods -n "$NAMESPACE" -o wide
-
-    - echo "📦 Namespace kontrol:"
-    - kubectl get ns |  grep "$NAMESPACE"
-
-    - echo "🚀 Deployment durumu:"
-    - kubectl get deployment -n "$NAMESPACE"
-
-    - echo "⏳ Pod Ready olmasını bekliyoruz..."
-    - echo "📦 Pods (watch 30s):"
-    - kubectl get pods -n "$NAMESPACE" -l app=$APP_NAME -w --request-timeout=30s || true
-
-    - echo "📦 Pods (final):"
-    - kubectl get pods -n "$NAMESPACE" -l app=$APP_NAME -o wide || true
-
-    - echo "🧠 Describe (newest pod):"
-    - POD=$(kubectl get pods -n "$NAMESPACE" -l app=$APP_NAME --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1:].metadata.name}')
-    - echo "POD=$POD"
-    - kubectl describe pod -n "$NAMESPACE" "$POD" | tail -n 200 || true
-
-    - echo "📜 Logs (current + previous):"
-    - kubectl logs -n "$NAMESPACE" "$POD" --tail=200 || true
-    - kubectl logs -n "$NAMESPACE" "$POD" --previous --tail=200 || true
 
     - kubectl rollout status deployment/mongo -n "$NAMESPACE" --timeout=180s || true
     - kubectl rollout status deployment/redis -n "$NAMESPACE" --timeout=180s || true
@@ -149,4 +112,4 @@ deploy-test:
   after_script:
     - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:$VAULT_CLUSTER
   allow_failure: false
-  timeout: 10 minutes
+  timeout: 20 minutes
