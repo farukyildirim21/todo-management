@@ -71,10 +71,10 @@ deploy-test:
     # Registry secret
     - kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE" || echo "secret already exists"
 
-    - kubectl delete deployment mongo -n "$NAMESPACE" --ignore-not-found=true
-    - kubectl delete pvc mongo-pvc -n "$NAMESPACE" --ignore-not-found=true
-    - kubectl delete rs -l app=mongo -n "$NAMESPACE" --ignore-not-found=true
-    - kubectl delete pod -l app=mongo -n "$NAMESPACE" --ignore-not-found=true
+    - kubectl delete deployment mongo -n "$NAMESPACE" --ignore-not-found=true --wait=false
+    - kubectl delete pvc mongo-pvc -n "$NAMESPACE" --ignore-not-found=true --wait=false
+    - kubectl delete rs -l app=mongo -n "$NAMESPACE" --ignore-not-found=true --wait=false
+    - kubectl delete pod -l app=mongo -n "$NAMESPACE" --ignore-not-found=true --wait=false
 
     
     - envsubst < backend/.k8s/mongo-deployment.yaml | kubectl apply -f -
@@ -142,7 +142,7 @@ deploy-test:
     - kubectl rollout status deployment/$APP_NAME -n "$NAMESPACE" --timeout=300s
       
       
-      - echo "📦 Pod listesi:"
+    - echo "📦 Pod listesi:"
     - kubectl get pods -n "$NAMESPACE" -o wide
 
     - echo "🧠 Pod detay (ilk pod):"
