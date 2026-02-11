@@ -1,6 +1,4 @@
-stages:
-  - build
-  - deploy-test
+
 
 variables:
     APP_NAME: 'todomanagement-api'
@@ -20,8 +18,8 @@ variables:
 # BUILD & PUSH IMAGE
 # -------------------------
 build-push:
-  stage: build
   image: docker:27
+  stage: build
   services:
     - name: docker:27.5.1-dind
       alias: docker
