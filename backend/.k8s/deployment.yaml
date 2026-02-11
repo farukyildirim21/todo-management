@@ -37,6 +37,12 @@ spec:
               value: test
             - name: ASPNETCORE_URLS
               value: "http://+:8080"
+            - name: MongoDb__ConnectionString
+              value: mongodb://mongo:27017
+            - name: MongoDb__Database
+              value: TodoManagement
+            - name: Redis__ConnectionString
+              value: redis:6379,abortConnect=false
 
           ports:
             - containerPort: 8080
