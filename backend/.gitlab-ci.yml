@@ -72,7 +72,7 @@ deploy-test:
     - kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE" || echo "secret already exists"
 
 
-    - envsubst < backend/.k8s/mongo-pvc.yaml | kubectl apply -f -
+    
     - envsubst < backend/.k8s/mongo-deployment.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/mongo-service.yaml | kubectl apply -f -
 
