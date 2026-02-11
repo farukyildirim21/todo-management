@@ -11,9 +11,10 @@ deploy-gateway:
     - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:retail-hke-test
 
   script:
-    - envsubst < gateway/.k8s/krakend-config.yaml | kubectl apply -f -
-    - envsubst < gateway/.k8s/deployment.yaml | kubectl apply -f -
-    - envsubst < gateway/.k8s/service.yaml | kubectl apply -f -
+    - envsubst '$NAMESPACE' < gateway/.k8s/krakend-config.yaml | kubectl apply -f -
+    - envsubst '$NAMESPACE' < gateway/.k8s/deployment.yaml | kubectl apply -f -
+    - envsubst '$NAMESPACE' < gateway/.k8s/service.yaml | kubectl apply -f -
+
     - kubectl get pods -n "$NAMESPACE"
     - kubectl describe pod -n "$NAMESPACE" -l app=krakend
     - kubectl logs -n "$NAMESPACE" deployment/krakend
