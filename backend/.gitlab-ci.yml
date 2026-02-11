@@ -67,11 +67,7 @@ deploy-test:
   script:
     - kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
-    - kubectl create secret docker-registry retail-gitlab \
-      --docker-server="$CI_REGISTRY" \
-      --docker-username="$DEPLOY_USERNAME" \
-      --docker-password="$DEPLOY_PASSWORD" \
-      -n "$NAMESPACE" || true
+    - kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE" || true
 
     - envsubst < backend/.k8s/mongo-deployment.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/mongo-service.yaml | kubectl apply -f -
