@@ -104,7 +104,7 @@ deploy-test:
     - kubectl get pods -n "$NAMESPACE" -o wide
 
     - echo "📦 Namespace kontrol:"
-    - kubectl get ns | grep "$NAMESPACE"
+    - kubectl get ns |  grep "$NAMESPACE"
 
     - echo "🚀 Deployment durumu:"
     - kubectl get deployment -n "$NAMESPACE"
