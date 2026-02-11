@@ -72,12 +72,13 @@ deploy-test:
     - kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE" || echo "secret already exists"
 
 
-    - kubectl apply -f backend/.k8s/mongo-pvc.yaml
-    - kubectl apply -f backend/.k8s/mongo-deployment.yaml
-    - kubectl apply -f backend/.k8s/mongo-service.yaml
+    - envsubst < backend/.k8s/mongo-pvc.yaml | kubectl apply -f -
+    - envsubst < backend/.k8s/mongo-deployment.yaml | kubectl apply -f -
+    - envsubst < backend/.k8s/mongo-service.yaml | kubectl apply -f -
 
-    - kubectl apply -f backend/.k8s/redis-deployment.yaml
-    - kubectl apply -f backend/.k8s/redis-service.yaml
+    - envsubst < backend/.k8s/redis-deployment.yaml | kubectl apply -f -
+    - envsubst < backend/.k8s/redis-service.yaml | kubectl apply -f -
+
     # Apply manifests
     - cat backend/.k8s/deployment.yaml | envsubst | kubectl apply -f -
     - if [ -f "backend/.k8s/service.yaml" ]; then
