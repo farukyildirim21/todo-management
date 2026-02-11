@@ -35,7 +35,7 @@
       "input_headers": ["Authorization", "Accept"],
       "backend": [
         {
-          "host": ["http://todomanagement-api:8080"],
+          "host": ["http://todomanagement-api"],
           "url_pattern": "/api/todos",
           "method": "GET",
           "isCollection": true
@@ -50,7 +50,7 @@
       "input_headers": ["Authorization", "Content-Type", "Accept"],
       "backend": [
         {
-          "host": ["http://todomanagement-api:8080"],
+          "host": ["http://todomanagement-api"],
           "url_pattern": "/api/todos",
           "method": "POST"
         }
@@ -63,7 +63,7 @@
       "input_headers": ["Authorization", "Accept"],
       "backend": [
         {
-          "host": ["http://todomanagement-api:8080"],
+          "host": ["http://todomanagement-api"],
           "url_pattern": "/api/todos/{id}",
           "method": "GET"
         }
@@ -76,7 +76,7 @@
       "input_headers": ["Authorization", "Content-Type", "Accept"],
       "backend": [
         {
-          "host": ["http://todomanagement-api:8080"],
+          "host": ["http://todomanagement-api"],
           "url_pattern": "/api/todos/{id}/complete",
           "method": "POST"
         }
@@ -89,7 +89,7 @@
       "input_headers": ["Authorization", "Content-Type", "Accept"],
       "backend": [
         {
-          "host": ["http://todomanagement-api:8080"],
+          "host": ["http://todomanagement-api"],
           "url_pattern": "/api/todos/{id}/cancel",
           "method": "POST"
         }

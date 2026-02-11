@@ -5,7 +5,7 @@ variables:
   NAMESPACE: "todo-test"
 
 deploy-gateway:
-  stage: deploy-gateway
+  
   image: devopshepsiburada/kubectl:1.25.0
   tags:
     - k8s

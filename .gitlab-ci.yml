@@ -1,3 +1,9 @@
+stages:
+  - build
+  - deploy-test
+  - deploy-gateway
+
+
 include:
   - local: '/backend/.gitlab-ci.yml'
   - local: '/gateway/.gitlab-ci.yml'
