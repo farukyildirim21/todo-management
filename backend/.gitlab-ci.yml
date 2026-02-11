@@ -78,7 +78,6 @@ deploy-test:
 
     - kubectl apply -f backend/.k8s/redis-deployment.yaml
     - kubectl apply -f backend/.k8s/redis-service.yaml
-    - 
     # Apply manifests
     - cat backend/.k8s/deployment.yaml | envsubst | kubectl apply -f -
     - if [ -f "backend/.k8s/service.yaml" ]; then
