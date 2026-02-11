@@ -14,6 +14,9 @@ deploy-gateway:
     - envsubst < gateway/.k8s/krakend-config.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/service.yaml | kubectl apply -f -
+    - kubectl get pods -n "$NAMESPACE"
+    - kubectl describe pod -n "$NAMESPACE" -l app=krakend
+    - kubectl logs -n "$NAMESPACE" deployment/krakend
 
     - kubectl rollout status deployment/krakend -n "$NAMESPACE" --timeout=180s
 
