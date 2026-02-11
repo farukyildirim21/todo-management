@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: krakend-config
+  namespace: ${NAMESPACE}
+data:
+  krakend.json: |
+      {
+        "$schema": "https://www.krakend.io/schema/v3.json",
+        "version": 3,
+        "name": "todo-management-gateway",
+        "port": 8081,
+        "timeout": "5s",
+
+        "extra_config": {
+          "security/cors": {
+          "allow_origins": ["*"],
+          "allow_methods": ["GET", "POST", "OPTIONS"],
+          "allow_headers": ["Origin", "Content-Type", "Authorization", "Accept"],
+          "expose_headers": ["Content-Length"],
+          "max_age": "12h"
+        },
+
+        "telemetry/logging": {
+          "level": "INFO",
+          "prefix": "[KRAKEND]",
+          "stdout": true,
+          "syslog": false
+    },
+
+        "telemetry/metrics": {
+          "collection_time":"60s",
+          "listen_address": ":8090"
+        }
+      },
+
+        "endpoints": [
+    {
+          "endpoint": "/todos",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["Authorization", "Accept"],
+          "backend": [
+            {
+              "host": ["http://todomanagement-api:8080"],
+              "url_pattern": "/api/todos",
+              "method": "GET",
+              "isCollection": true
+        
+            }
+          ]
+        },
+        {
+          "endpoint": "/todos",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": ["Authorization", "Content-Type", "Accept"],
+          "backend": [
+            {
+              "host": ["http://todomanagement-api:8080"],
+              "url_pattern": "/api/todos",
+              "method": "POST"
+            }
+          ]
+        },
+        {
+          "endpoint": "/todos/{id}",
+          "method": "GET",
+          "output_encoding": "no-op",
+          "input_headers": ["Authorization", "Accept"],
+          "backend": [
+            {
+              "host": ["http://todomanagement-api:8080"],
+              "url_pattern": "/api/todos/{id}",
+              "method": "GET"
+            }
+          ]
+        },
+        {
+          "endpoint": "/todos/{id}/complete",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": ["Authorization", "Content-Type", "Accept"],
+          "backend": [
+            {
+              "host": ["http://todomanagement-api:8080"],
+              "url_pattern": "/api/todos/{id}/complete",
+              "method": "POST"
+            }
+          ]
+        },
+        {
+          "endpoint": "/todos/{id}/cancel",
+          "method": "POST",
+          "output_encoding": "no-op",
+          "input_headers": ["Authorization", "Content-Type", "Accept"],
+          "backend": [
+            {
+              "host": ["http://todomanagement-api:8080"],
+              "url_pattern": "/api/todos/{id}/cancel",
+              "method": "POST"
+              }
+            ]
+          }
+       ]
+      }
+

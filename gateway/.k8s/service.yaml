@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: krakend
+  namespace: ${NAMESPACE}
+
+spec:
+  selector:
+    app: krakend
+
+  ports:
+    - port: 80
+      targetPort: 8081
+
+  type: ClusterIP
