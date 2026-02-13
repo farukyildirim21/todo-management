@@ -50,6 +50,8 @@ deploy-frontend:
 
     - echo "📜 Frontend logları:"
     - kubectl logs -n "$NAMESPACE" -l app=todomanagement-frontend --tail=200
+    - kubectl describe pod todomanagement-frontend-797db75cdd-vsh9j -n "$NAMESPACE"
+
 
 
     - kubectl rollout status deployment/todomanagement-frontend -n "$NAMESPACE" --timeout=180s
