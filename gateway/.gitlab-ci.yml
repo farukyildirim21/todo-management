@@ -13,6 +13,9 @@ build-gateway:
     - name: docker:27.5.1-dind
       alias: docker
       command: ["--tls=false","--mtu=1410"]
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
 
   tags:
     - k8s
@@ -21,6 +24,7 @@ build-gateway:
     - echo -n "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
   script:
+    - docker info
     - cd gateway
     - docker build -t "$GATEWAY_IMAGE" .
     - docker push "$GATEWAY_IMAGE"
