@@ -1,9 +1,9 @@
 stages:
   - build
-  - deploy-test
+  - deploy-backend
   - deploy-gateway
   - build-frontend
-  - deploy-frontend
+  
 
 
 include:

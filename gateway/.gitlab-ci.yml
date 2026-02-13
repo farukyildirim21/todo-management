@@ -1,10 +1,10 @@
 variables:
-  APP_NAME: "krakend"
+  GATEWAY_NAME: "krakend"
   NAMESPACE: "todo-test"
-  GATEWAY_IMAGE: "$CI_REGISTRY_IMAGE/${APP_NAME}:${CI_PIPELINE_ID}"
+  GATEWAY_IMAGE: "$CI_REGISTRY_IMAGE/${GATEWAY_NAME}:${CI_PIPELINE_ID}"
 
 # -------------------------
-# BUILD & PUSH GATEWAY IMAGE
+# BUILD GATEWAY
 # -------------------------
 build-gateway:
   image: docker:27
@@ -13,6 +13,7 @@ build-gateway:
     - name: docker:27.5.1-dind
       alias: docker
       command: ["--tls=false","--mtu=1410"]
+
   variables:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
@@ -31,7 +32,6 @@ build-gateway:
 
   timeout: 20 minutes
 
-
 # -------------------------
 # DEPLOY GATEWAY
 # -------------------------
@@ -45,23 +45,20 @@ deploy-gateway:
     - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:retail-hke-test
 
   script:
-    # Namespace (idempotent)
     - kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
-    # Registry Secret (same as backend)
-    - kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE" || echo "secret exists"
+    - kubectl get secret retail-gitlab -n "$NAMESPACE" >/dev/null 2>&1 || kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE"
 
-    # Apply manifests
+    - envsubst < gateway/.k8s/configmap.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/service.yaml | kubectl apply -f -
-    - envsubst < gateway/.k8s/configmap.yaml | kubectl apply -f -
 
+    - kubectl rollout status deployment/$GATEWAY_NAME -n "$NAMESPACE" --timeout=180s
 
-    # Rollout
-    - kubectl rollout status deployment/krakend -n "$NAMESPACE" --timeout=180s
-
-    # Debug
+    - echo "📦 Gateway Pods:"
     - kubectl get pods -n "$NAMESPACE"
-    - kubectl logs -n "$NAMESPACE" -l app=krakend --tail=100
+
+    - echo "📜 Gateway Logs:"
+    - kubectl logs -n "$NAMESPACE" -l app=$GATEWAY_NAME --tail=100
 
   timeout: 20 minutes

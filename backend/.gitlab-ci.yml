@@ -1,113 +1,68 @@
-
-
 variables:
-    APP_NAME: 'todomanagement-api'
-    ENV: 'test'
-    NAMESPACE: 'todo-test'
-    IMAGE_PATH: '$CI_REGISTRY_IMAGE/${APP_NAME}:${CI_PIPELINE_ID}'
-    NODE_ENV: 'production'
-
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-    VAULT_ADDRESS_QA: 'https://pass-portal-qa.hepsiburada.com'
-    VAULT_ADDRESS_PROD: 'https://pass-portal.hepsiburada.com'
-
+  BACKEND_NAME: "todomanagement-api"
+  NAMESPACE: "todo-test"
+  IMAGE_PATH: "$CI_REGISTRY_IMAGE/${BACKEND_NAME}:${CI_PIPELINE_ID}"
 
 # -------------------------
 # BUILD & PUSH IMAGE
 # -------------------------
-build-push:
+build-backend:
   image: docker:27
   stage: build
   services:
     - name: docker:27.5.1-dind
       alias: docker
       command: ["--tls=false","--mtu=1410"]
-       
+
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+
   tags:
     - k8s
+
   before_script:
-    - docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_PASSWORD"
     - echo -n "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+
   script:
-    - echo "DOCKER_HOST=$DOCKER_HOST"
     - docker info
     - cd backend
-    - docker build --rm=true --no-cache --pull -f TodoManagement.Api/Dockerfile -t "$IMAGE_PATH" .
+    - docker build --pull -f TodoManagement.Api/Dockerfile -t "$IMAGE_PATH" .
     - docker push "$IMAGE_PATH"
-  retry:
-    max: 2
-    when: runner_system_failure
+
   timeout: 20 minutes
 
 # -------------------------
-# DEPLOY TO retail-hke-test
+# DEPLOY BACKEND
 # -------------------------
-deploy-test:
-  stage: deploy-test
-  extends: .deploy
-  variables:
-    ENV: "test"
-    VAULT_CLUSTER: "retail-hke-test"
-    CI_ENVIRONMENT_SLUG: "retail-hke-test"
-
-# -------------------------
-# DEPLOY TEMPLATE
-# -------------------------
-.deploy:
+deploy-backend:
+  stage: deploy-backend
   image: devopshepsiburada/kubectl:1.25.0
   tags:
     - k8s
+
   before_script:
-    - echo "Using cluster => $VAULT_CLUSTER"
-    - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:$VAULT_CLUSTER
+    - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:retail-hke-test
+
   script:
-    # Namespace (idempotent)
     - kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
-    # Registry secret
-    - kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE" || echo "secret already exists"
+    - kubectl get secret retail-gitlab -n "$NAMESPACE" >/dev/null 2>&1 || kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE"
 
-    
-    
     - envsubst < backend/.k8s/mongo-deployment.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/mongo-service.yaml | kubectl apply -f -
-
     - envsubst < backend/.k8s/redis-deployment.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/redis-service.yaml | kubectl apply -f -
 
-    # Apply manifests
-    - cat backend/.k8s/deployment.yaml | envsubst | kubectl apply -f -
-    - if [ -f "backend/.k8s/service.yaml" ]; then
-      cat backend/.k8s/service.yaml | envsubst | kubectl apply -f -;
-      else
-      echo "service.yaml not found";
-      fi
-    
-    
-    
-    # -------------------------
-    # ✅ VERIFY / HEALTH CHECK
-    # -------------------------
-    - echo "🧾 Rendered manifest (deployment):"
-    - envsubst < backend/.k8s/deployment.yaml | sed -n '1,200p'
+    - envsubst < backend/.k8s/deployment.yaml | kubectl apply -f -
+    - envsubst < backend/.k8s/service.yaml | kubectl apply -f -
 
+    - kubectl rollout status deployment/$BACKEND_NAME -n "$NAMESPACE" --timeout=300s
 
-    - kubectl rollout status deployment/mongo -n "$NAMESPACE" --timeout=180s || true
-    - kubectl rollout status deployment/redis -n "$NAMESPACE" --timeout=180s || true
-    - kubectl rollout status deployment/$APP_NAME -n "$NAMESPACE" --timeout=300s
-      
-      
-    - echo "📦 Pod listesi:"
-    - kubectl get pods -n "$NAMESPACE" -o wide
+    - echo "📦 Backend Pod List:"
+    - kubectl get pods -n "$NAMESPACE"
 
-    - echo "🧠 Pod detay (ilk pod):"
-    - kubectl describe pod -n "$NAMESPACE" -l app=$APP_NAME | tail -n 120
+    - echo "📜 Backend Logs:"
+    - kubectl logs -n "$NAMESPACE" -l app=$BACKEND_NAME --tail=100
 
-    - echo "📜 Application logları:"
-    - kubectl logs -n "$NAMESPACE" -l app=$APP_NAME --tail=200
-  after_script:
-    - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:$VAULT_CLUSTER
-  allow_failure: false
   timeout: 20 minutes

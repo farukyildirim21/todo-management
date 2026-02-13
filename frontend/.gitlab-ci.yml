@@ -1,16 +1,19 @@
 variables:
+  FRONTEND_NAME: "todomanagement-frontend"
   NAMESPACE: "todo-test"
-  FRONTEND_NAME: 'todomanagement-frontend'
-  FRONTEND_IMAGE: '$CI_REGISTRY_IMAGE/${FRONTEND_NAME}:${CI_PIPELINE_ID}'
+  FRONTEND_IMAGE: "$CI_REGISTRY_IMAGE/${FRONTEND_NAME}:${CI_PIPELINE_ID}"
 
+# -------------------------
+# BUILD FRONTEND
+# -------------------------
 build-frontend:
-  
   image: docker:27
   stage: build
   services:
     - name: docker:27.5.1-dind
       alias: docker
       command: ["--tls=false","--mtu=1410"]
+
   variables:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
@@ -27,8 +30,13 @@ build-frontend:
     - docker build -t "$FRONTEND_IMAGE" .
     - docker push "$FRONTEND_IMAGE"
 
+  timeout: 20 minutes
+
+# -------------------------
+# DEPLOY FRONTEND
+# -------------------------
 deploy-frontend:
-  stage: deploy-test
+  stage: deploy-frontend
   image: devopshepsiburada/kubectl:1.25.0
   tags:
     - k8s
@@ -39,20 +47,16 @@ deploy-frontend:
   script:
     - kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
-    - kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE" || echo "secret exists"
-
+    - kubectl get secret retail-gitlab -n "$NAMESPACE" >/dev/null 2>&1 || kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" \-n "$NAMESPACE"
     - envsubst < frontend/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < frontend/.k8s/service.yaml | kubectl apply -f -
-    - echo "📦 Pod listesi:"
+
+    - kubectl rollout status deployment/$FRONTEND_NAME -n "$NAMESPACE" --timeout=180s
+
+    - echo "📦 Frontend Pods:"
     - kubectl get pods -n "$NAMESPACE"
 
-    - echo "🧠 Pod detay:"
-    - kubectl describe pod -n "$NAMESPACE" -l app=todomanagement-frontend
+    - echo "📜 Frontend Logs:"
+    - kubectl logs -n "$NAMESPACE" -l app=$FRONTEND_NAME --tail=100
 
-    - echo "📜 Frontend logları:"
-    - kubectl logs -n "$NAMESPACE" -l app=todomanagement-frontend --tail=200
-    - kubectl describe pod todomanagement-frontend-797db75cdd-vsh9j -n "$NAMESPACE"
-
-
-
-    - kubectl rollout status deployment/todomanagement-frontend -n "$NAMESPACE" --timeout=180s
+  timeout: 20 minutes
