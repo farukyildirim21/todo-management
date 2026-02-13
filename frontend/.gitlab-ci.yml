@@ -1,5 +1,5 @@
 variables:
-  FRONTEND_NAME: ${FRONTEND_NAME}
+  FRONTEND_NAME: "todomanagement-frontend"
   NAMESPACE: "todo-test"
   FRONTEND_IMAGE: "$CI_REGISTRY_IMAGE/${FRONTEND_NAME}:${CI_PIPELINE_ID}"
 
