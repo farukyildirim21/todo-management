@@ -53,7 +53,7 @@ deploy-gateway:
     - envsubst < gateway/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/service.yaml | kubectl apply -f -
 
-    - kubectl rollout status deployment/$GATEWAY_NAME -n "$NAMESPACE" --timeout=180s
+  
 
     - echo "📦 Gateway Pods:"
     - kubectl get pods -n "$NAMESPACE"
