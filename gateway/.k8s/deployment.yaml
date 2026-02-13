@@ -19,13 +19,13 @@ spec:
         app: krakend
 
     spec:
+      imagePullSecrets:
+        - name: retail-gitlab
+
       containers:
         - name: krakend
-          image: krakend/krakend:2.9
-          args: ["run", "-c", "/etc/krakend/krakend.json"]
-          env:
-            - name: PORT
-              value: "8081"
+          image: ${CI_REGISTRY_IMAGE}/krakend:${CI_PIPELINE_ID}
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 8081

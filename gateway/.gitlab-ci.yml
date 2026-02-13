@@ -1,6 +1,36 @@
 variables:
+  APP_NAME: "krakend"
   NAMESPACE: "todo-test"
+  GATEWAY_IMAGE: "$CI_REGISTRY_IMAGE/${APP_NAME}:${CI_PIPELINE_ID}"
 
+# -------------------------
+# BUILD & PUSH GATEWAY IMAGE
+# -------------------------
+build-gateway:
+  image: docker:27
+  stage: build
+  services:
+    - name: docker:27.5.1-dind
+      alias: docker
+      command: ["--tls=false","--mtu=1410"]
+
+  tags:
+    - k8s
+
+  before_script:
+    - echo -n "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+
+  script:
+    - cd gateway
+    - docker build -t "$GATEWAY_IMAGE" .
+    - docker push "$GATEWAY_IMAGE"
+
+  timeout: 20 minutes
+
+
+# -------------------------
+# DEPLOY GATEWAY
+# -------------------------
 deploy-gateway:
   stage: deploy-gateway
   image: devopshepsiburada/kubectl:1.25.0
@@ -9,27 +39,25 @@ deploy-gateway:
 
   before_script:
     - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:retail-hke-test
-    
-
 
   script:
-    - kubectl delete deployment krakend -n "$NAMESPACE" --ignore-not-found=true
-    - kubectl delete service krakend -n "$NAMESPACE" --ignore-not-found=true
-    - envsubst '$NAMESPACE' < gateway/.k8s/krakend-config.yaml | kubectl apply -f -
-    - envsubst '$NAMESPACE' < gateway/.k8s/deployment.yaml | kubectl apply -f -
-    - envsubst '$NAMESPACE' < gateway/.k8s/service.yaml | kubectl apply -f -
-    - kubectl get configmap krakend-config -n "$NAMESPACE" -o yaml
+    # Namespace (idempotent)
+    - kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
-    - kubectl get pods -n "$NAMESPACE"
-    - kubectl describe pod -n "$NAMESPACE" -l app=krakend
-    - kubectl logs -n "$NAMESPACE" deployment/krakend
-    - kubectl rollout restart deployment/krakend -n "$NAMESPACE"
-    - kubectl describe pod -n "$NAMESPACE" krakend-67b5c9796d-kxtvj
-    
-    - kubectl describe pod krakend-6c97f4c597-7jzj8 -n todo-test
+    # Registry Secret (same as backend)
+    - kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE" || echo "secret exists"
+
+    # Apply manifests
+    - envsubst < gateway/.k8s/deployment.yaml | kubectl apply -f -
+    - envsubst < gateway/.k8s/service.yaml | kubectl apply -f -
+    - envsubst < gateway/.k8s/configmap.yaml | kubectl apply -f -
 
 
-
+    # Rollout
     - kubectl rollout status deployment/krakend -n "$NAMESPACE" --timeout=180s
 
-  timeout: 10 minutes
+    # Debug
+    - kubectl get pods -n "$NAMESPACE"
+    - kubectl logs -n "$NAMESPACE" -l app=krakend --tail=100
+
+  timeout: 20 minutes
