@@ -1,0 +1,49 @@
+variables:
+  FRONTEND_NAME: 'todomanagement-frontend'
+  FRONTEND_IMAGE: '$CI_REGISTRY_IMAGE/${FRONTEND_NAME}:${CI_PIPELINE_ID}'
+
+build-frontend:
+  image: docker:27
+  stage: build
+  services:
+    - name: docker:27.5.1-dind
+      alias: docker
+      command: ["--tls=false","--mtu=1410"]
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+
+  tags:
+    - k8s
+
+  before_script:
+    - echo -n "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+
+  script:
+    - docker info
+    - cd frontend
+    - docker build -t "$FRONTEND_IMAGE" .
+    - docker push "$FRONTEND_IMAGE"
+
+deploy-frontend:
+  stage: deploy-test
+  image: devopshepsiburada/kubectl:1.25.0
+  tags:
+    - k8s
+
+  before_script:
+    - kubectl config use-context $CI_PROJECT_ROOT_NAMESPACE/gitlab-agents:retail-hke-test
+
+  script:
+    - kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
+
+    - kubectl create secret docker-registry retail-gitlab \
+      --docker-server="$CI_REGISTRY" \
+      --docker-username="$DEPLOY_USERNAME" \
+      --docker-password="$DEPLOY_PASSWORD" \
+      -n "$NAMESPACE" || echo "secret exists"
+
+    - envsubst < frontend/.k8s/deployment.yaml | kubectl apply -f -
+    - envsubst < frontend/.k8s/service.yaml | kubectl apply -f -
+
+    - kubectl rollout status deployment/todomanagement-frontend -n "$NAMESPACE" --timeout=180s

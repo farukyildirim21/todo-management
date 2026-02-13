@@ -2,7 +2,9 @@ stages:
   - build
   - deploy-test
   - deploy-gateway
+  - build-frontend
+  - deploy-frontend
 
 
 include:
-  - local: '/gateway/.gitlab-ci.yml'
+  - local: '/frontend/.gitlab-ci.yml'

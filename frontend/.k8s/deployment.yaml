@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todomanagement-frontend
+  namespace: ${NAMESPACE}
+  labels:
+    app: todomanagement-frontend
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: todomanagement-frontend
+
+  template:
+    metadata:
+      labels:
+        app: todomanagement-frontend
+
+    spec:
+      imagePullSecrets:
+        - name: retail-gitlab
+
+      containers:
+        - name: frontend
+          image: ${FRONTEND_IMAGE}
+          ports:
+            - containerPort: 80
