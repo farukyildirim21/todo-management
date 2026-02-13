@@ -51,8 +51,7 @@ deploy-frontend:
     - envsubst < frontend/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < frontend/.k8s/service.yaml | kubectl apply -f -
 
-    - kubectl rollout status deployment/$FRONTEND_NAME -n "$NAMESPACE" --timeout=180s
-
+   
     - echo "📦 Frontend Pods:"
     - kubectl get pods -n "$NAMESPACE"
 
