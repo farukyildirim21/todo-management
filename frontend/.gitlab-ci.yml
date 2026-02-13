@@ -4,6 +4,7 @@ variables:
   FRONTEND_IMAGE: '$CI_REGISTRY_IMAGE/${FRONTEND_NAME}:${CI_PIPELINE_ID}'
 
 build-frontend:
+  
   image: docker:27
   stage: build
   services:
