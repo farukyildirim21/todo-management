@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: krakend
-          image: devopsfaith/krakend:2.9
+          image: krakend/krakend:2.9
           args: ["run", "-c", "/etc/krakend/krakend.json"]
           env:
             - name: PORT
