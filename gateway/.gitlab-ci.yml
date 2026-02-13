@@ -25,6 +25,9 @@ deploy-gateway:
     - kubectl logs -n "$NAMESPACE" deployment/krakend
     - kubectl rollout restart deployment/krakend -n "$NAMESPACE"
     - kubectl describe pod -n "$NAMESPACE" krakend-67b5c9796d-kxtvj
+    
+    - kubectl describe pod krakend-6c97f4c597-7jzj8 -n todo-test
+
 
 
     - kubectl rollout status deployment/krakend -n "$NAMESPACE" --timeout=180s
