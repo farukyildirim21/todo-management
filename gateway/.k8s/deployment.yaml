@@ -28,7 +28,7 @@ spec:
 
       containers:
         - name: krakend
-          image: ${CI_REGISTRY_IMAGE}/krakend:${CI_PIPELINE_ID}
+          image: ${GATEWAY_IMAGE}
           imagePullPolicy: Always
 
           ports:
