@@ -10,10 +10,8 @@ spec:
   replicas: 1
 
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0   # traffic kesilmesin
+    type: Recreate
+    
 
   selector:
     matchLabels:
@@ -25,7 +23,7 @@ spec:
         app: ${BACKEND_NAME}
 
     spec:
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 10
 
       containers:
         - name: ${BACKEND_NAME}
