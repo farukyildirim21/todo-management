@@ -42,5 +42,14 @@ deploy-frontend:
 
     - envsubst < frontend/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < frontend/.k8s/service.yaml | kubectl apply -f -
+    - echo "📦 Pod listesi:"
+    - kubectl get pods -n "$NAMESPACE"
+
+    - echo "🧠 Pod detay:"
+    - kubectl describe pod -n "$NAMESPACE" -l app=todomanagement-frontend
+
+    - echo "📜 Frontend logları:"
+    - kubectl logs -n "$NAMESPACE" -l app=todomanagement-frontend --tail=200
+
 
     - kubectl rollout status deployment/todomanagement-frontend -n "$NAMESPACE" --timeout=180s
