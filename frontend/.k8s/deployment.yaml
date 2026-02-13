@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todomanagement-frontend
+  name: ${FRONTEND_NAME}
   namespace: ${NAMESPACE}
   labels:
-    app: todomanagement-frontend
+    app: ${FRONTEND_NAME}
 
 spec:
   replicas: 1
@@ -14,12 +14,12 @@ spec:
 
   selector:
     matchLabels:
-      app: todomanagement-frontend
+      app: ${FRONTEND_NAME}
 
   template:
     metadata:
       labels:
-        app: todomanagement-frontend
+        app: ${FRONTEND_NAME}
 
     spec:
       imagePullSecrets:
@@ -28,7 +28,7 @@ spec:
 
 
       containers:
-        - name: frontend
+        - name: ${FRONTEND_NAME}
           image: ${FRONTEND_IMAGE}
           imagePullPolicy: Always
 
