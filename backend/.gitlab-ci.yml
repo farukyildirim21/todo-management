@@ -57,19 +57,18 @@ deploy-backend:
     - envsubst < backend/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/service.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/ingress.yaml | kubectl apply -f -
-    
     - echo "📦 Pods:"
     - kubectl get pods -n "$NAMESPACE" -o wide
 
-    
+    - # ✅ Pod ready olana kadar bekle
     - echo "⏳ Waiting backend pod to be Ready..."
     - kubectl wait --for=condition=Ready pod -l app=$BACKEND_NAME -n "$NAMESPACE" --timeout=180s || true
 
-   
+    - # ✅ Ready olamadıysa sebebini göster (events burada çıkar)
     - echo "🔍 Describe backend pod:"
     - kubectl describe pod -n "$NAMESPACE" -l app=$BACKEND_NAME || true
 
-   
+    - # ✅ Logs (hazırsa gelir; değilse job’u bozmaz)
     - echo "📜 Backend logs:"
     - kubectl logs -n "$NAMESPACE" -l app=$BACKEND_NAME --tail=200 || true
     
