@@ -24,8 +24,6 @@ spec:
 
     spec:
       terminationGracePeriodSeconds: 10
-      imagePullSecrets:
-        - name: retail-gitlab
 
       containers:
         - name: ${BACKEND_NAME}
@@ -80,4 +78,5 @@ spec:
             timeoutSeconds: 3
             failureThreshold: 3
 
-      
+      imagePullSecrets:
+        - name: retail-gitlab
