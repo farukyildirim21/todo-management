@@ -22,6 +22,7 @@ spec:
         app: krakend
 
     spec:
+      enableServiceLinks: false
       terminationGracePeriodSeconds: 10
       imagePullSecrets:
         - name: retail-gitlab
