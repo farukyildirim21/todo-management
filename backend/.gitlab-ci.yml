@@ -28,7 +28,7 @@ build-backend:
     - docker info
     - cd backend
     - docker build --pull -f TodoManagement.Api/Dockerfile -t "$IMAGE_PATH" .
-    - docker push "$IMAGE_PATH"
+    - docker push "$IMAGE_PATH" || docker push "$IMAGE_PATH"
 
   timeout: 20 minutes
 
