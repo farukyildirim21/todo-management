@@ -73,6 +73,7 @@ deploy-backend:
     - kubectl describe pod -n "$NAMESPACE" -l app=$BACKEND_NAME
  
  
+ 
 
 
   timeout: 20 minutes
