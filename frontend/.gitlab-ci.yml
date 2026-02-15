@@ -50,9 +50,11 @@ deploy-frontend:
     - kubectl get secret retail-gitlab -n "$NAMESPACE" >/dev/null 2>&1 || kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" \-n "$NAMESPACE"
     - envsubst < frontend/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < frontend/.k8s/service.yaml | kubectl apply -f -
-
-   
-   
+    - envsubst < frontend/.k8s/ingress.yaml | kubectl apply -f -
+    
+    
+    
+    
     - echo "📦 Frontend Pods:"
     - kubectl get pods -n "$NAMESPACE"
 

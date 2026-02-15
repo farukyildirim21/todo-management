@@ -56,10 +56,12 @@ deploy-backend:
 
     - envsubst < backend/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/service.yaml | kubectl apply -f -
-
+    - envsubst < backend/.k8s/ingress.yaml | kubectl apply -f -
     
     
-
+    
+    
+    
     - echo "📦 Backend Pod List:"
     - kubectl get pods -n "$NAMESPACE"
 
