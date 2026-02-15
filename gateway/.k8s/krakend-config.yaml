@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: krakend-config
-  namespace: ${NAMESPACE}
+  namespace: todo-test
 data:
   krakend.json: |-
     {

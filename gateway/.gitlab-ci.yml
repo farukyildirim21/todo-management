@@ -49,7 +49,8 @@ deploy-gateway:
 
     - kubectl get secret retail-gitlab -n "$NAMESPACE" >/dev/null 2>&1 || kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE"
 
-    - envsubst < gateway/.k8s/krakend-config.yaml | kubectl apply -f -
+    - kubectl apply -f gateway/.k8s/krakend-config.yaml
+
     - envsubst < gateway/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/service.yaml | kubectl apply -f -
 
