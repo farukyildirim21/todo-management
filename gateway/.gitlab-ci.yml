@@ -73,6 +73,21 @@ deploy-gateway:
 
     - echo "🔍 Environment Variables:"
     - kubectl exec -n "$NAMESPACE" $POD_NAME -- printenv | grep PORT || true
+    
+    - echo "🧾 krakend-config (as applied in cluster):"
+    - kubectl get configmap krakend-config -n "$NAMESPACE" -o yaml || true
 
-
+    - echo "🧾 Extract krakend.json from ConfigMap:"
+    - kubectl get configmap krakend-config -n "$NAMESPACE" -o jsonpath='{.data.krakend\.json}' || true
+    - echo ""
+    - echo "🧪 Rendered krakend-config.yaml (after envsubst):"
+    - envsubst < gateway/.k8s/krakend-config.yaml | sed -n '1,220p'
+  
+  
+  
+  
+  
+  
+  
+  
   timeout: 20 minutes
