@@ -30,6 +30,11 @@ spec:
         - name: krakend
           image: ${GATEWAY_IMAGE}
           imagePullPolicy: Always
+          command: [ "/usr/bin/krakend" ]
+          args:
+              - run
+              - -c
+              - /etc/krakend/krakend.json
 
           ports:
             - containerPort: 8081
