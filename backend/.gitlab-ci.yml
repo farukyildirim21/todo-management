@@ -64,13 +64,14 @@ deploy-backend:
     
     - echo "📦 Backend Pod List:"
     - kubectl get pods -n "$NAMESPACE"
+    - kubectl describe pod -n "$NAMESPACE" -l app=$BACKEND_NAME
 
     - echo "📜 Backend Logs:"
     - kubectl logs -n "$NAMESPACE" -l app=$BACKEND_NAME --tail=100
     - kubectl get ingressclass
     - kubectl get pods -A | grep -i ingress
     - kubectl get svc -A | grep -i ingress
-    - kubectl describe pod -n "$NAMESPACE" -l app=$BACKEND_NAME
+   
  
  
  
