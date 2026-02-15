@@ -52,6 +52,7 @@ deploy-frontend:
     - envsubst < frontend/.k8s/service.yaml | kubectl apply -f -
 
    
+   
     - echo "📦 Frontend Pods:"
     - kubectl get pods -n "$NAMESPACE"
 
