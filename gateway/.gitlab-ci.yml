@@ -48,6 +48,9 @@ deploy-gateway:
     - kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
     - kubectl get secret retail-gitlab -n "$NAMESPACE" >/dev/null 2>&1 || kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE"
+    - kubectl delete service krakend -n "$NAMESPACE" --ignore-not-found=true
+    - kubectl delete deployment krakend -n "$NAMESPACE" --ignore-not-found=true
+    - sleep 5
 
     - kubectl apply -f gateway/.k8s/krakend-config.yaml
 

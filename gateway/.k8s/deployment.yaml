@@ -31,9 +31,7 @@ spec:
         - name: krakend
           image: ${GATEWAY_IMAGE}
           imagePullPolicy: Always
-          env:
-            - name: FC_PORT
-              value: "8081"
+          
 
           command: [ "/usr/bin/krakend" ]
           args:
