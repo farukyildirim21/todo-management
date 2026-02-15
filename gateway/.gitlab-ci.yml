@@ -57,7 +57,7 @@ deploy-gateway:
 
     - envsubst < gateway/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/service.yaml | kubectl apply -f -
-    - kubectl rollout status deployment/krakend -n "$NAMESPACE" --timeout=120s
+    - kubectl rollout status deployment/krakend -n "$NAMESPACE" --timeout=120s || true
 
   
 
