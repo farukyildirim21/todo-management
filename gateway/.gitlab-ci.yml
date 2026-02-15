@@ -49,17 +49,13 @@ deploy-gateway:
 
 
     - kubectl get secret retail-gitlab -n "$NAMESPACE" >/dev/null 2>&1 || kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" -n "$NAMESPACE"
-    - kubectl delete service krakend -n "$NAMESPACE" --ignore-not-found=true
-    - kubectl delete deployment krakend -n "$NAMESPACE" --ignore-not-found=true
-    - sleep 5
-
     - kubectl apply -f gateway/.k8s/krakend-config.yaml
 
     - envsubst < gateway/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/service.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/ingress.yaml | kubectl apply -f -
 
-    - kubectl rollout status deployment/krakend -n "$NAMESPACE" --timeout=120s || true
+   
 
     - echo "📦 Gateway node IP:"
     - kubectl get nodes -o wide
