@@ -60,5 +60,19 @@ deploy-gateway:
 
     - echo "📜 Gateway Logs:"
     - kubectl logs -n "$NAMESPACE" -l app=$GATEWAY_NAME --tail=100
+    
+    - echo "🔍 Describe KrakenD Pod:"
+    - kubectl describe pod -n "$NAMESPACE" -l app=$GATEWAY_NAME || true
+
+    - echo "🔍 Mounted files inside container:"
+    - POD_NAME=$(kubectl get pods -n "$NAMESPACE" -l app=$GATEWAY_NAME -o jsonpath="{.items[0].metadata.name}")
+    - kubectl exec -n "$NAMESPACE" $POD_NAME -- ls -la /etc/krakend || true
+
+    - echo "🔍 Actual krakend.json content:"
+    - kubectl exec -n "$NAMESPACE" $POD_NAME -- cat /etc/krakend/krakend.json || true
+
+    - echo "🔍 Environment Variables:"
+    - kubectl exec -n "$NAMESPACE" $POD_NAME -- printenv | grep PORT || true
+
 
   timeout: 20 minutes
