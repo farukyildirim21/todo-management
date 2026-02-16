@@ -65,6 +65,7 @@ deploy-backend:
     
     - kubectl get events -n todo-test --sort-by=.lastTimestamp
 
+
     - echo "📦 Backend Pod List:"
     - kubectl get pods -n "$NAMESPACE"
     - kubectl describe pod -n "$NAMESPACE" -l app=$BACKEND_NAME
