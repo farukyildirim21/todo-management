@@ -65,8 +65,6 @@ deploy-backend:
     - curl http://localhost:8080/health
     - kubectl rollout status deployment/$BACKEND_NAME -n $NAMESPACE --timeout=120s
     
-    
-    
 
   
 
