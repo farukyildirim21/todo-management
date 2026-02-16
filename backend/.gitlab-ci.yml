@@ -73,6 +73,9 @@ deploy-backend:
     - kubectl get svc -A | grep -i ingress
     - kubectl get ingress -n todo-test
     - kubectl get svc -n ingress-nginx
+    - kubectl get svc todomanagement-api -n todo-test -o wide
+    - kubectl get svc todomanagement-api -n todo-test -o yaml
+  
   
   
   
