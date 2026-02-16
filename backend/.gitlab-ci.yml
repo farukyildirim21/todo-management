@@ -61,10 +61,7 @@ deploy-backend:
     - kubectl describe pod $POD_NAME -n $NAMESPACE || true
     - kubectl logs $POD_NAME -n $NAMESPACE || true
     - kubectl get events -n todo-test --sort-by=.lastTimestamp
-  
-    - kubectl rollout status deployment/$BACKEND_NAME -n $NAMESPACE --timeout=120s
-    
-  
+
 
     - echo "📦 Backend Pod List:"
     - kubectl get pods -n "$NAMESPACE"
