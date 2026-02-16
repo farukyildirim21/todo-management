@@ -61,8 +61,7 @@ deploy-backend:
     - kubectl describe pod $POD_NAME -n $NAMESPACE || true
     - kubectl logs $POD_NAME -n $NAMESPACE || true
     - kubectl get events -n todo-test --sort-by=.lastTimestamp
-    - kubectl port-forward svc/todomanagement-api 8080:80 -n todo-test
-    - curl http://localhost:8080/health
+  
     - kubectl rollout status deployment/$BACKEND_NAME -n $NAMESPACE --timeout=120s
     
 
