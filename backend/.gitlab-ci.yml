@@ -54,6 +54,7 @@ deploy-backend:
     - envsubst < backend/.k8s/redis-deployment.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/redis-service.yaml | kubectl apply -f -
 
+
     - envsubst < backend/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/service.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/ingress.yaml | kubectl apply -f -
