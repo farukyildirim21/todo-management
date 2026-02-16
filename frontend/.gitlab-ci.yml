@@ -60,5 +60,7 @@ deploy-frontend:
 
     - echo "📜 Frontend Logs:"
     - kubectl logs -n "$NAMESPACE" -l app=$FRONTEND_NAME --tail=100
+    - kubectl get ingress -n todo-test
+
 
   timeout: 20 minutes

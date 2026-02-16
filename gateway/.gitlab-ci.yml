@@ -87,6 +87,7 @@ deploy-gateway:
     - echo ""
     - echo "🧪 Rendered krakend-config.yaml (after envsubst):"
     - envsubst < gateway/.k8s/krakend-config.yaml | sed -n '1,220p'
+    - kubectl get ingress -n todo-test
   
   
   
