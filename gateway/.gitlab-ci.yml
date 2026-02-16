@@ -58,6 +58,7 @@ deploy-gateway:
     - kubectl rollout status deployment/krakend -n "$NAMESPACE" --timeout=120s
 
     
+    
 
     - echo "📦 Gateway node IP:"
     - kubectl get nodes -o wide
