@@ -57,6 +57,10 @@ deploy-backend:
     - envsubst < backend/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/service.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/ingress.yaml | kubectl apply -f -
+    - kubectl get pods -n $NAMESPACE
+    - POD_NAME=$(kubectl get pods -n $NAMESPACE -l app=$BACKEND_NAME -o jsonpath="{.items[0].metadata.name}")
+    - kubectl describe pod $POD_NAME -n $NAMESPACE || true
+    - kubectl logs $POD_NAME -n $NAMESPACE || true
     - kubectl get events -n todo-test --sort-by=.lastTimestamp
     - kubectl rollout status deployment/$BACKEND_NAME -n $NAMESPACE --timeout=120s
     
