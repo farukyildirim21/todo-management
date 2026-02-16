@@ -28,7 +28,7 @@ build-frontend:
     - docker info
     - cd frontend
     - docker build -t "$FRONTEND_IMAGE" .
-    - docker push "$FRONTEND_IMAGE"
+    - docker push "$FRONTEND_IMAGE" || docker push "$IMAGE_PATH"
 
   timeout: 20 minutes
 
