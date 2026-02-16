@@ -28,7 +28,7 @@ spec:
       containers:
         - name: ${BACKEND_NAME}
           image: ${IMAGE_PATH}
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
 
           env:
             - name: ENV
