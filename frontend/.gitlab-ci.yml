@@ -53,7 +53,6 @@ deploy-frontend:
     - envsubst < frontend/.k8s/ingress.yaml | kubectl apply -f -
     - kubectl rollout status deployment/$FRONTEND_NAME -n "$NAMESPACE"
     
-    
     - echo "📦 Frontend Pods:"
     - kubectl get pods -n "$NAMESPACE"
 
