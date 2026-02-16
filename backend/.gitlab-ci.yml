@@ -64,7 +64,6 @@ deploy-backend:
   
     - kubectl rollout status deployment/$BACKEND_NAME -n $NAMESPACE --timeout=120s
     
-
   
 
     - echo "📦 Backend Pod List:"
