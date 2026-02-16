@@ -77,6 +77,8 @@ deploy-backend:
     - kubectl get svc todomanagement-api -n todo-test -o yaml
     - kubectl get endpoints todomanagement-api -n todo-test
     - kubectl describe ingress todomanagement-api-ingress -n todo-test
+    - kubectl get pods -n todo-test --show-labels
+  
   
   
   
