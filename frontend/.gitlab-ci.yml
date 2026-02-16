@@ -48,10 +48,32 @@ deploy-frontend:
     - kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
     - kubectl get secret retail-gitlab -n "$NAMESPACE" >/dev/null 2>&1 || kubectl create secret docker-registry retail-gitlab --docker-server="$CI_REGISTRY" --docker-username="$DEPLOY_USERNAME" --docker-password="$DEPLOY_PASSWORD" \-n "$NAMESPACE"
+    - envsubst < frontend/.k8s/deployment.yaml > actual_deployment.yaml
+    - echo "--- DEBUG: Actual Deployment Image ---"
+    - grep "image:" actual_deployment.yaml
     - envsubst < frontend/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < frontend/.k8s/service.yaml | kubectl apply -f -
     - envsubst < frontend/.k8s/ingress.yaml | kubectl apply -f -
     - kubectl rollout status deployment/$FRONTEND_NAME -n "$NAMESPACE"
+    -  echo "⏳ Waiting for pods to stabilize..."
+    - |
+      for i in {1..24}; do
+       STATUS=$(kubectl get pods -n "$NAMESPACE" -l app=$FRONTEND_NAME --no-headers | awk '{print $3}' | head -n 1)
+       READY=$(kubectl get pods -n "$NAMESPACE" -l app=$FRONTEND_NAME --no-headers | awk '{print $2}' | head -n 1)
+       echo "Current Status: $STATUS ($READY)"
+       if [ "$READY" == "1/1" ]; then
+         echo "✅ Success!"
+         exit 0
+       fi
+       sleep 5
+      done
+      
+      echo "❌ Deployment failed or timed out. Showing details:"
+      kubectl get pods -n "$NAMESPACE"
+      kubectl describe pod -n "$NAMESPACE" -l app=$FRONTEND_NAME
+      kubectl logs -n "$NAMESPACE" -l app=$FRONTEND_NAME --tail=50
+      exit 1
+       
     
     - echo "📦 Frontend Pods:"
     - kubectl get pods -n "$NAMESPACE"
