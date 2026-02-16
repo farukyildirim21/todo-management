@@ -57,6 +57,8 @@ deploy-backend:
     - envsubst < backend/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/service.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/ingress.yaml | kubectl apply -f -
+    - kubectl rollout status deployment/$BACKEND_NAME -n $NAMESPACE --timeout=120s
+    
     
     
     
@@ -78,7 +80,9 @@ deploy-backend:
     - kubectl get endpoints todomanagement-api -n todo-test
     - kubectl describe ingress todomanagement-api-ingress -n todo-test
     - kubectl get pods -n todo-test --show-labels
-    - kubectl describe pod todomanagement-api-68fc8db6c5-6vl7h -n todo-test
+    - POD_NAME=$(kubectl get pods -n $NAMESPACE -l app=$BACKEND_NAME -o jsonpath="{.items[0].metadata.name}")
+    - kubectl describe pod $POD_NAME -n $NAMESPACE || true
+  
   
   
   
