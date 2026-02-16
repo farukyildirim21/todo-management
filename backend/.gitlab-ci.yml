@@ -72,6 +72,8 @@ deploy-backend:
     - kubectl get pods -A | grep -i ingress
     - kubectl get svc -A | grep -i ingress
     - kubectl get ingress -n todo-test
+    - kubectl get svc -n ingress-nginx
+  
   
   
   
