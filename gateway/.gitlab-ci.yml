@@ -55,7 +55,7 @@ deploy-gateway:
     - envsubst < gateway/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/service.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/ingress.yaml | kubectl apply -f -
-    - kubectl rollout status deployment/krakend -n "$NAMESPACE" --timeout=60s || true
+    
 
     
     
@@ -67,7 +67,7 @@ deploy-gateway:
     - kubectl get pods -n "$NAMESPACE"
 
     - echo "📜 Gateway Logs:"
-    - kubectl logs -n "$NAMESPACE" -l app=$GATEWAY_NAME --tail=100
+    - kubectl logs -n "$NAMESPACE" -l app=$GATEWAY_NAME --tail=100 || true
     
     - echo "🔍 Describe KrakenD Pod:"
     - kubectl describe pod -n "$NAMESPACE" -l app=$GATEWAY_NAME || true
