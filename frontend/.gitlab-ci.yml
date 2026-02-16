@@ -59,7 +59,7 @@ deploy-frontend:
     - kubectl get pods -n "$NAMESPACE"
 
     - echo "📜 Frontend Logs:"
-    - kubectl logs -n "$NAMESPACE" -l app=$FRONTEND_NAME --tail=100
+    - kubectl logs -n "$NAMESPACE" -l app=$FRONTEND_NAME --tail=100 || true
     - kubectl get ingress -n todo-test
     - kubectl get svc -n ingress-nginx
 
