@@ -59,6 +59,7 @@ deploy-gateway:
 
     
     
+    
 
     - echo "📦 Gateway node IP:"
     - kubectl get nodes -o wide
