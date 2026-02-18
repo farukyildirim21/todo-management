@@ -52,6 +52,7 @@ deploy-gateway:
     
     - kubectl apply -f gateway/.k8s/krakend-config.yaml
 
+
     - envsubst < gateway/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/service.yaml | kubectl apply -f -
    
