@@ -10,6 +10,6 @@ spec:
   ports:
     - name: http-gateway
       protocol: TCP
-      port: 8081
+      port: 80
       targetPort: 8081
       nodePort: 32380

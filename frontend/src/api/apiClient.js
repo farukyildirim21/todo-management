@@ -27,7 +27,8 @@ const basicAuthHeader = {
  * Axios instance configured for KrakenD Gateway
  */
 const api = axios.create({
-    baseURL: "http://localhost:8081",
+    
+    baseURL: "http://10.219.17.95:32380",
     timeout: 5000,
     headers: {
         "Content-Type": "application/json",
