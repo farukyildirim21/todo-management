@@ -81,6 +81,7 @@ deploy-backend:
     - kubectl get pods -n todo-test --show-labels
     - POD_NAME=$(kubectl get pods -n $NAMESPACE -l app=$BACKEND_NAME -o jsonpath="{.items[0].metadata.name}")
     - kubectl describe pod $POD_NAME -n $NAMESPACE || true
+    - kubectl port-forward svc/todomanagement-api 8080:80 -n todo-test
   
   
   
