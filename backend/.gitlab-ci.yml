@@ -63,21 +63,15 @@ deploy-backend:
     - kubectl get events -n todo-test --sort-by=.lastTimestamp
 
 
-    - echo "📦 Backend Pod List:"
+    - echo "Backend Pod List:"
     - kubectl get pods -n "$NAMESPACE"
     - kubectl describe pod -n "$NAMESPACE" -l app=$BACKEND_NAME
 
-    - echo "📜 Backend Logs:"
+    - echo "Backend Logs:"
     - kubectl logs -n "$NAMESPACE" -l app=$BACKEND_NAME --tail=100 || true
-    - kubectl get ingressclass
-    - kubectl get pods -A | grep -i ingress
-    - kubectl get svc -A | grep -i ingress
-    - kubectl get ingress -n todo-test
-    - kubectl get svc -n ingress-nginx
     - kubectl get svc todomanagement-api -n todo-test -o wide
     - kubectl get svc todomanagement-api -n todo-test -o yaml
     - kubectl get endpoints todomanagement-api -n todo-test
-    - kubectl describe ingress todomanagement-api-ingress -n todo-test
     - kubectl get pods -n todo-test --show-labels
     - POD_NAME=$(kubectl get pods -n $NAMESPACE -l app=$BACKEND_NAME -o jsonpath="{.items[0].metadata.name}")
     - kubectl describe pod $POD_NAME -n $NAMESPACE || true

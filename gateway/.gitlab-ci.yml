@@ -61,38 +61,36 @@ deploy-gateway:
     
     
 
-    - echo "📦 Gateway node IP:"
+    - echo "Gateway node IP:"
     - kubectl get nodes -o wide
-    - echo "📦 Gateway Pods:"
+    - echo "Gateway Pods:"
     - kubectl get pods -n "$NAMESPACE"
 
-    - echo "📜 Gateway Logs:"
+    - echo "Gateway Logs:"
     - kubectl logs -n "$NAMESPACE" -l app=$GATEWAY_NAME --tail=100 || true
     
-    - echo "🔍 Describe KrakenD Pod:"
+    - echo "Describe KrakenD Pod:"
     - kubectl describe pod -n "$NAMESPACE" -l app=$GATEWAY_NAME || true
 
-    - echo "🔍 Mounted files inside container:"
+    - echo "Mounted files inside container:"
     - POD_NAME=$(kubectl get pods -n "$NAMESPACE" -l app=$GATEWAY_NAME -o jsonpath="{.items[0].metadata.name}")
     - kubectl exec -n "$NAMESPACE" $POD_NAME -- ls -la /etc/krakend || true
 
-    - echo "🔍 Actual krakend.json content:"
+    - echo "Actual krakend.json content:"
     - kubectl exec -n "$NAMESPACE" $POD_NAME -- cat /etc/krakend/krakend.json || true
 
-    - echo "🔍 Environment Variables:"
+    - echo "Environment Variables:"
     - kubectl exec -n "$NAMESPACE" $POD_NAME -- printenv | grep PORT || true
     
-    - echo "🧾 krakend-config (as applied in cluster):"
+    - echo "rakend-config (as applied in cluster):"
     - kubectl get configmap krakend-config -n "$NAMESPACE" -o yaml || true
 
-    - echo "🧾 Extract krakend.json from ConfigMap:"
+    - echo "Extract krakend.json from ConfigMap:"
     - kubectl get configmap krakend-config -n "$NAMESPACE" -o jsonpath='{.data.krakend\.json}' || true
     - echo ""
-    - echo "🧪 Rendered krakend-config.yaml (after envsubst):"
+    - echo "Rendered krakend-config.yaml (after envsubst):"
     - envsubst < gateway/.k8s/krakend-config.yaml | sed -n '1,220p'
-    - kubectl get ingress -n todo-test
-    - kubectl get svc -n ingress-nginx
-    
+   
   
   
   
