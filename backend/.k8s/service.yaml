@@ -4,10 +4,12 @@ metadata:
   name: ${BACKEND_NAME}
   namespace: ${NAMESPACE}
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: ${BACKEND_NAME}
   ports:
-    - name: http
-      port: 80
+    - name: http-api
+      protocol: TCP
+      port: 8080
       targetPort: 8080
+      nodePort: 32370

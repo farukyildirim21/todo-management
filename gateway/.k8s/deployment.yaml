@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: krakend
+  name: ${GATEWAY_NAME}
   namespace: ${NAMESPACE}
   labels:
-    app: krakend
+    app: ${GATEWAY_NAME}
 
 spec:
   replicas: 1
@@ -14,12 +14,12 @@ spec:
 
   selector:
     matchLabels:
-      app: krakend
+      app: ${GATEWAY_NAME}
 
   template:
     metadata:
       labels:
-        app: krakend
+        app: ${GATEWAY_NAME}
 
     spec:
       enableServiceLinks: false
@@ -28,7 +28,7 @@ spec:
         - name: retail-gitlab
 
       containers:
-        - name: krakend
+        - name: ${GATEWAY_NAME}
           image: ${GATEWAY_IMAGE}
           imagePullPolicy: Always
           

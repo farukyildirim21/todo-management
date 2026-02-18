@@ -3,13 +3,13 @@ kind: Service
 metadata:
   name: ${FRONTEND_NAME}
   namespace: ${NAMESPACE}
-
 spec:
+  type: NodePort
   selector:
     app: ${FRONTEND_NAME}
-
   ports:
-    - port: 80
+    - name: http        # Portun isimlendirilmesi (best-practice)
+      protocol: TCP     # Kullanılan protokol
+      port: 80
       targetPort: 80
-
-  type: ClusterIP
+      nodePort: 32390

@@ -55,7 +55,7 @@ deploy-backend:
     - envsubst < backend/.k8s/redis-service.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < backend/.k8s/service.yaml | kubectl apply -f -
-    - envsubst < backend/.k8s/ingress.yaml | kubectl apply -f -
+   
     - kubectl get pods -n $NAMESPACE
     - POD_NAME=$(kubectl get pods -n $NAMESPACE -l app=$BACKEND_NAME -o jsonpath="{.items[0].metadata.name}")
     - kubectl describe pod $POD_NAME -n $NAMESPACE || true
@@ -81,7 +81,7 @@ deploy-backend:
     - kubectl get pods -n todo-test --show-labels
     - POD_NAME=$(kubectl get pods -n $NAMESPACE -l app=$BACKEND_NAME -o jsonpath="{.items[0].metadata.name}")
     - kubectl describe pod $POD_NAME -n $NAMESPACE || true
-    - kubectl port-forward svc/todomanagement-api 8080:80 -n todo-test
+   
   
   
   

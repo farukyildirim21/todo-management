@@ -50,8 +50,8 @@ deploy-frontend:
     - grep "image:" actual_deployment.yaml
     - kubectl apply -f actual_deployment.yaml
     - envsubst < frontend/.k8s/service.yaml | kubectl apply -f -
-    - envsubst < frontend/.k8s/ingress.yaml | kubectl apply -f -
+    
     - echo "⏳ Monitoring pod status..."
     - for i in $(seq 1 20); do POD_DATA=$(kubectl get pods -n "$NAMESPACE" -l app=$FRONTEND_NAME --no-headers | head -n 1); STATUS=$(echo $POD_DATA | awk '{print $3}'); READY=$(echo $POD_DATA | awk '{print $2}'); echo "Step $i - Status:$STATUS ($READY)"; if [ "$READY" == "1/1" ]; then echo "✅ Success!"; exit 0; fi; if [ "$STATUS" == "ImagePullBackOff" ] || [ "$STATUS" == "ErrImagePull" ]; then echo "❌ Image Error!"; kubectl describe pod -n "$NAMESPACE" -l app=$FRONTEND_NAME; exit 1; fi; sleep 5; done; echo "❌ Timeout!"; kubectl describe pod -n "$NAMESPACE" -l app=$FRONTEND_NAME; exit 1
-    - kubectl port-forward svc/todomanagement-frontend 8082:80 -n todo-test
+    
   timeout: 20 minutes

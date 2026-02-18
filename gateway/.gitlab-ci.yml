@@ -1,5 +1,5 @@
 variables:
-  GATEWAY_NAME: "krakend"
+  GATEWAY_NAME: "gateway-krakend"
   NAMESPACE: "todo-test"
   GATEWAY_IMAGE: "$CI_REGISTRY_IMAGE/${GATEWAY_NAME}:${CI_PIPELINE_ID}"
 
@@ -54,8 +54,7 @@ deploy-gateway:
 
     - envsubst < gateway/.k8s/deployment.yaml | kubectl apply -f -
     - envsubst < gateway/.k8s/service.yaml | kubectl apply -f -
-    - envsubst < gateway/.k8s/ingress.yaml | kubectl apply -f -
-    
+   
 
     
     
@@ -92,7 +91,7 @@ deploy-gateway:
     - envsubst < gateway/.k8s/krakend-config.yaml | sed -n '1,220p'
     - kubectl get ingress -n todo-test
     - kubectl get svc -n ingress-nginx
-    - kubectl port-forward svc/krakend 8081:80 -n todo-test
+    
   
   
   
