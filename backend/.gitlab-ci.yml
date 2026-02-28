@@ -37,7 +37,7 @@ build-backend:
 # -------------------------
 deploy-backend:
   stage: deploy-backend
-  image: devopshepsiburada/kubectl:1.25.0
+  image: #imageName
   tags:
     - k8s
 

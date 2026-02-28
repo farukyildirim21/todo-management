@@ -72,6 +72,8 @@ public sealed class Todo : AggregateRoot
     }
     // write tarafında kullanılır. kalıcı hale getirilmis bir verinin iş kurallarını tetiklemeden
     //tekrarda bellege alınması islemidir. 
+    // Database’te duran veriyi tekrar canlı domain objesine dönüştürmek
+    // todo complete, cancel ya da update işlemlerinde kullanılır.
     public static Todo Rehydrate(
     TodoId id,
     Guid userId,

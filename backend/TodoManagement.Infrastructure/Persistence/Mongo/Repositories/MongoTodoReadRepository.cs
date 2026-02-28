@@ -22,17 +22,17 @@ public sealed class MongoTodoReadRepository : ITodoReadRepository
         _cache = cache;
     }
 
-    // 🔹 Tekil Todo detayı
+    // Tekil Todo detayı
     public async Task<GetTodoDetailResult?> GetTodoDetailAsync(Guid todoId)
     {
         var cacheKey = CacheKeys.TodoById(todoId);
 
-        // 1️⃣ Cache
+        // 1Cache
         var cached = await _cache.GetAsync<GetTodoDetailResult>(cacheKey);
         if (cached != null)
             return cached;
 
-        // 2️⃣ Mongo
+        // Mongo
         var doc = await _collection
             .Find(x => x.Id == todoId)
             .FirstOrDefaultAsync();
@@ -40,7 +40,7 @@ public sealed class MongoTodoReadRepository : ITodoReadRepository
         if (doc is null)
             return null;
 
-        // 3️⃣ Mapping → Application Read Model
+        //3Mapping → Application Read Model
         var result = new GetTodoDetailResult
         {
             Id = doc.Id,
@@ -48,7 +48,7 @@ public sealed class MongoTodoReadRepository : ITodoReadRepository
             Status = doc.Status
         };
 
-        // 4️⃣ Cache write
+        // Cache write
         await _cache.SetAsync(
             cacheKey,
             result,
@@ -58,12 +58,12 @@ public sealed class MongoTodoReadRepository : ITodoReadRepository
         return result;
     }
 
-    // 🔹 Kullanıcıya ait todo listesi
+    // Kullanıcıya ait todo listesi
     public async Task<IReadOnlyList<GetUserTodosResult>> GetUserTodosAsync(Guid userId)
     {
         var cacheKey = CacheKeys.TodosByUser(userId);
 
-        // 1️⃣ Cache
+        // Cache
         var cached = await _cache.GetAsync<IReadOnlyList<GetUserTodosResult>>(cacheKey);
         if (cached != null){
 
@@ -73,12 +73,12 @@ Console.WriteLine("🟢 TODOS FROM REDIS");
 
 Console.WriteLine("🟡 TODOS FROM MONGO");
 
-        // 2️⃣ Mongo
+        // Mongo
         var docs = await _collection
             .Find(x => x.UserId == userId)
             .ToListAsync();
 
-        // 3️⃣ Mapping → Application Read Model
+        // Mapping → Application Read Model
         var items = docs
             .Select(x => new GetUserTodosResult
             {
@@ -88,7 +88,7 @@ Console.WriteLine("🟡 TODOS FROM MONGO");
             })
             .ToList();
 
-        // 4️⃣ Cache write
+        // Cache write
         await _cache.SetAsync(
             cacheKey,
             items,

@@ -1,5 +1,6 @@
 namespace TodoManagement.Domain.Todos;
 // value-object
+
 //Record ne sağlar?
 //1)Equals() otomatik
 //2)GetHashCode() otomatik

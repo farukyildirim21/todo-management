@@ -95,11 +95,6 @@ public sealed class TodosController : ControllerBase
     {
         var query = new GetUserTodosQuery(_currentUser.Id);
         var result = await _getUserTodosHandler.Handle(query);
-Console.WriteLine(
-    $"[DEBUG] GetUserTodos result = " +
-    System.Text.Json.JsonSerializer.Serialize(result)
-);
-
         return Ok(result);
     }
 }

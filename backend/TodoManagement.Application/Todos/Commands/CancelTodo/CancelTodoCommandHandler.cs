@@ -19,7 +19,7 @@ public sealed class CancelTodoCommandHandler
 
     public async Task Handle(CancelTodoCommand command)
     {
-        var todoId = new TodoId(command.todoId); // ✅ doğru yer
+        var todoId = new TodoId(command.todoId); // doğru yer
 
         var todo = await _repository.GetByIdAsync(todoId);
         if (todo is null)
